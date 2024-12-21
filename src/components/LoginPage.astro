@@ -1,0 +1,123 @@
+---
+import { ChevronLeft } from "lucide-astro";
+import background from "../assets/background.svg";
+---
+
+<div
+  class="min-h-screen font-['Inter,Roboto,Helvetica_Neue,Arial_Nova,Nimbus_Sans,Arial,sans-serif']"
+>
+  <img
+    id="background"
+    src={background.src}
+    alt=""
+    fetchpriority="high"
+    class="fixed top-0 left-0 w-full h-full -z-10 blur-[120px] opacity-80"
+  />
+
+  <main
+    class="flex flex-col items-center justify-center min-h-screen py-12 px-4"
+  >
+    <div class="w-full max-w-md">
+      <div class="mb-8">
+        <a
+          href="/"
+          class="flex items-center text-blue-600 hover:text-blue-700 mb-6"
+        >
+          <ChevronLeft class="w-5 h-5 mr-1" />
+          Retour
+        </a>
+        <h1
+          class="text-4xl font-extrabold text-gray-900 mb-2 bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent"
+        >
+          Se connecter
+        </h1>
+        <p class="text-lg text-gray-600">
+          Commencez à optimiser votre productivité aujourd'hui
+        </p>
+      </div>
+
+      <div class="bg-white/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
+        <form class="space-y-6" id="signupForm">
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Mot de passe
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+            Se connecter
+          </button>
+        </form>
+
+        <p class="mt-6 text-center text-gray-600">
+          Pas de compte?{" "}
+          <a
+            href="/login"
+            class="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            S'inscrire
+          </a>
+        </p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Client-side form handling
+  const form = document.getElementById("signupForm");
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const data = Object.fromEntries(formData.entries());
+
+    // Add your form submission logic here
+    try {
+      // Example: Send data to your API
+      // const response = await fetch('/api/signup', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(data),
+      // });
+
+      console.log("Form data:", data);
+      // Handle successful signup
+    } catch (error) {
+      console.error("Signup error:", error);
+      // Handle error
+    }
+  });
+</script>

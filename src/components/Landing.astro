@@ -1,0 +1,154 @@
+---
+import background from "../assets/background.svg";
+import {
+  ChevronRight,
+  CheckCircle,
+  Users,
+  Calendar,
+  Bell,
+  ShieldCheck,
+} from "lucide-astro";
+
+const features = [
+  {
+    icon: CheckCircle,
+    title: "Gestion des Tâches",
+    description:
+      "Créez, modifiez et suivez vos tâches facilement. Priorisez votre travail et restez organisé.",
+  },
+  {
+    icon: Users,
+    title: "Collaboration d'Équipe",
+    description:
+      "Partagez des tâches, communiquez avec les membres de l'équipe et travaillez ensemble efficacement.",
+  },
+  {
+    icon: Calendar,
+    title: "Planification de Projets",
+    description:
+      "Gérez vos projets avec des chronologies visuelles et suivez les progrès en temps réel.",
+  },
+  {
+    icon: Bell,
+    title: "Notifications Intelligentes",
+    description:
+      "Restez informé grâce aux rappels automatisés et aux notifications par email.",
+  },
+];
+---
+
+<div
+  class="min-h-screen font-['Inter,Roboto,Helvetica_Neue,Arial_Nova,Nimbus_Sans,Arial,sans-serif']"
+>
+  <img
+    id="background"
+    src={background.src}
+    alt=""
+    fetchpriority="high"
+    class="fixed top-0 left-0 w-full h-full -z-10 blur-[120px] opacity-80"
+  />
+
+  <main class="flex flex-col justify-center pt-32">
+    <section id="hero" class="text-center px-4 py-20 relative">
+      <div class="max-w-5xl mx-auto">
+        <h1
+          class="text-6xl font-extrabold text-gray-900 mb-8 leading-tight bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent"
+        >
+          Gestion Intelligente des Tâches pour les Équipes Modernes
+        </h1>
+        <p
+          class="text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
+        >
+          Optimisez votre flux de travail, augmentez votre productivité et
+          collaborez en toute fluidité avec notre plateforme de gestion des
+          tâches de nouvelle génération.
+        </p>
+        <div class="flex gap-6 justify-center">
+          <a
+            href="signup"
+            class="px-8 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 flex items-center text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+            Commencer Gratuitement
+            <ChevronRight class="ml-2 w-6 h-6" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="px-4 py-8">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        {
+          features.map(({ icon: Icon, title, description }) => (
+            <div class="p-8 bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <Icon class="w-7 h-7 text-blue-600" />
+              </div>
+              <h3 class="text-2xl font-bold mb-4 text-gray-900">{title}</h3>
+              <p class="text-gray-600 text-lg leading-relaxed">{description}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="teams" class="px-4 py-24">
+      <div
+        class="bg-white/90 backdrop-blur-lg rounded-3xl p-12 shadow-xl max-w-7xl mx-auto"
+      >
+        <h2
+          class="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"
+        >
+          Parfait pour les équipes de toutes tailles
+        </h2>
+        <div class="grid md:grid-cols-3 gap-12 text-center">
+          <div
+            class="p-8 rounded-2xl hover:bg-blue-50 transition-all duration-300"
+          >
+            <div
+              class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <Users class="w-7 h-7 text-blue-600" />
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900">
+              Petites Équipes
+            </h3>
+            <p class="text-gray-600 text-lg leading-relaxed">
+              Restez agile et organisé avec des outils de gestion de tâches
+              faciles à utiliser.
+            </p>
+          </div>
+          <div
+            class="p-8 rounded-2xl hover:bg-blue-50 transition-all duration-300"
+          >
+            <div
+              class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <CheckCircle class="w-7 h-7 text-blue-600" />
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900">
+              Entreprises en Croissance
+            </h3>
+            <p class="text-gray-600 text-lg leading-relaxed">
+              Adaptez votre flux de travail avec des fonctionnalités avancées de
+              gestion de projet.
+            </p>
+          </div>
+          <div
+            class="p-8 rounded-2xl hover:bg-blue-50 transition-all duration-300"
+          >
+            <div
+              class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <ShieldCheck class="w-7 h-7 text-blue-600" />
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900">Sécurité</h3>
+            <p class="text-gray-600 text-lg leading-relaxed">
+              Personnalisez et sécurisez votre espace de travail avec des
+              contrôles de niveau entreprise.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
