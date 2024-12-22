@@ -1,0 +1,205 @@
+---
+export const prerender = false;
+// Add session check at the top
+const sessionId = Astro.cookies.get("session-id");
+if (!sessionId?.value) {
+  console.log("User not logged in");
+  return Astro.redirect("/login");
+}
+
+const userName = Astro.cookies.get("user-name")?.value;
+const userEmail = Astro.cookies.get("user-email")?.value;
+
+import { db, Task, Project, Comment } from "astro:db";
+import Layout from "../layouts/Layout.astro";
+import {
+  CheckSquare,
+  Calendar,
+  Users,
+  BarChart2,
+  Plus,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-astro";
+
+const tasks = await db.select().from(Task);
+const projects = await db.select().from(Project);
+const comments = await db.select().from(Comment);
+---
+
+<Layout>
+  <div class="min-h-screen bg-gray-50">
+    <nav class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-gray-900">Tableau de bord</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <!-- Add user info and logout button -->
+            <div class="flex items-center space-x-4">
+              <div class="text-sm text-gray-600">
+                <p class="font-medium">{userName}</p>
+                <p class="text-xs">{userEmail}</p>
+              </div>
+              <form action="/api/logout" method="POST">
+                <button
+                  type="submit"
+                  class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Déconnexion
+                </button>
+              </form>
+            </div>
+            <button
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
+            >
+              <Plus class="w-5 h-5" />
+              <span>Nouvelle Tâche</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    {/* Main Content */}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Stats Overview */}
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Tâches en cours</p>
+              <p class="text-2xl font-bold text-gray-900">12</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-lg">
+              <Clock class="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Tâches urgentes</p>
+              <p class="text-2xl font-bold text-gray-900">3</p>
+            </div>
+            <div class="bg-red-100 p-3 rounded-lg">
+              <AlertCircle class="w-6 h-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Tâches terminées</p>
+              <p class="text-2xl font-bold text-gray-900">28</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+              <CheckCircle class="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Membres actifs</p>
+              <p class="text-2xl font-bold text-gray-900">8</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-lg">
+              <Users class="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tasks and Projects Grid */}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Tasks */}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-gray-900">Tâches Récentes</h2>
+            <button class="text-blue-600 hover:text-blue-700">Voir tout</button>
+          </div>
+          <div class="space-y-4">
+            {
+              tasks.map((task) => (
+                <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-medium text-gray-900">{task.title}</h3>
+                    <span
+                      class={`px-2 py-1 rounded-full text-xs ${
+                        task.priority === "high"
+                          ? "bg-red-100 text-red-800"
+                          : task.priority === "medium"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {task.priority}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm text-gray-500">
+                    <div class="flex items-center space-x-2">
+                      <Users class="w-4 h-4" />
+                      <span>{task.assignedTo}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <Calendar class="w-4 h-4" />
+                      <span>{task.dueDate}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        {/* Active Projects */}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-gray-900">Projets Actifs</h2>
+            <button class="text-blue-600 hover:text-blue-700">Voir tout</button>
+          </div>
+          <div class="space-y-6">
+            {
+              projects.map((project) => {
+                const totalTasks = tasks.filter(
+                  (task) => task.projectId === project.id,
+                ).length;
+                const completedTasks = tasks.filter(
+                  (task) =>
+                    task.projectId === project.id &&
+                    task.status === "completed",
+                ).length;
+                const progress =
+                  totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+                return (
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                      <h3 class="font-medium text-gray-900">{project.name}</h3>
+                      <span class="text-sm text-gray-500">
+                        {completedTasks}/{totalTasks} tâches
+                      </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        class="bg-blue-600 h-2 rounded-full"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            }
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</Layout>
+};

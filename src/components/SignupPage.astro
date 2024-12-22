@@ -1,4 +1,10 @@
 ---
+export const prerender = false;
+
+import { actions, isInputError } from "astro:actions";
+
+const result = Astro.getActionResult(actions.signup);
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
 import { ChevronLeft } from "lucide-astro";
 import background from "../assets/background.svg";
 ---
@@ -37,7 +43,7 @@ import background from "../assets/background.svg";
       </div>
 
       <div class="bg-white/90 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-        <form class="space-y-6" id="signupForm">
+        <form method="POST" action={actions.signup} class="space-y-6">
           <div>
             <label
               for="fullName"
@@ -49,9 +55,20 @@ import background from "../assets/background.svg";
               type="text"
               id="fullName"
               name="fullName"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              transition:persist
+              class:list={[
+                "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                inputErrors.fullName ? "border-red-300" : "border-gray-300",
+              ]}
               required
             />
+            {
+              inputErrors.fullName && (
+                <p class="mt-1 text-sm text-red-600">
+                  {inputErrors.fullName.join(", ")}
+                </p>
+              )
+            }
           </div>
 
           <div>
@@ -65,9 +82,20 @@ import background from "../assets/background.svg";
               type="email"
               id="email"
               name="email"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              transition:persist
+              class:list={[
+                "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                inputErrors.email ? "border-red-300" : "border-gray-300",
+              ]}
               required
             />
+            {
+              inputErrors.email && (
+                <p class="mt-1 text-sm text-red-600">
+                  {inputErrors.email.join(", ")}
+                </p>
+              )
+            }
           </div>
 
           <div>
@@ -81,9 +109,20 @@ import background from "../assets/background.svg";
               type="text"
               id="companyName"
               name="companyName"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              transition:persist
+              class:list={[
+                "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                inputErrors.companyName ? "border-red-300" : "border-gray-300",
+              ]}
               required
             />
+            {
+              inputErrors.companyName && (
+                <p class="mt-1 text-sm text-red-600">
+                  {inputErrors.companyName.join(", ")}
+                </p>
+              )
+            }
           </div>
 
           <div>
@@ -97,9 +136,20 @@ import background from "../assets/background.svg";
               type="password"
               id="password"
               name="password"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              transition:persist
+              class:list={[
+                "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                inputErrors.password ? "border-red-300" : "border-gray-300",
+              ]}
               required
             />
+            {
+              inputErrors.password && (
+                <p class="mt-1 text-sm text-red-600">
+                  {inputErrors.password.join(", ")}
+                </p>
+              )
+            }
           </div>
 
           <div>
@@ -113,9 +163,22 @@ import background from "../assets/background.svg";
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              transition:persist
+              class:list={[
+                "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                inputErrors.confirmPassword
+                  ? "border-red-300"
+                  : "border-gray-300",
+              ]}
               required
             />
+            {
+              inputErrors.confirmPassword && (
+                <p class="mt-1 text-sm text-red-600">
+                  {inputErrors.confirmPassword.join(", ")}
+                </p>
+              )
+            }
           </div>
 
           <button
@@ -139,33 +202,3 @@ import background from "../assets/background.svg";
     </div>
   </main>
 </div>
-
-<script>
-  // Client-side form handling
-  const form = document.getElementById("signupForm");
-
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target as HTMLFormElement);
-    const data = Object.fromEntries(formData.entries());
-
-    // Add your form submission logic here
-    try {
-      // Example: Send data to your API
-      // const response = await fetch('/api/signup', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(data),
-      // });
-
-      console.log("Form data:", data);
-      // Handle successful signup
-    } catch (error) {
-      console.error("Signup error:", error);
-      // Handle error
-    }
-  });
-</script>
