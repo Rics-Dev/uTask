@@ -22,7 +22,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const actionResult = await action.handler();
 
     // Handle successful signup redirect
-    if (actionResult.data.success && actionResult.data.redirect) {
+    if (actionResult.data?.success && actionResult.data?.redirect) {
       return context.redirect(actionResult.data.redirect);
     }
 
