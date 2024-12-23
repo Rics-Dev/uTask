@@ -6,7 +6,6 @@ import { db, User, Organization, OrganizationMember } from 'astro:db';
 import { eq } from 'astro:db';
 import { randomUUID } from "node:crypto";
 
-
 export const server = {
   signup: defineAction({
     accept: 'form',
@@ -37,6 +36,7 @@ export const server = {
           });
         }
 
+        // Create user
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(input.password, salt);
 
@@ -48,30 +48,24 @@ export const server = {
           isActive: true,
         }).returning();
 
+        // Create organization
         const [newOrg] = await db.insert(Organization).values({
           name: input.companyName,
           orgType: 'small',
         }).returning();
 
+        // Create organization membership
         await db.insert(OrganizationMember).values({
           orgId: newOrg.id,
           userId: newUser.id,
           role: 'admin',
         });
 
-        const sessionId = randomUUID();
-        context.cookies.set('session-id', sessionId, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-          path: '/',
-        });
-        context.cookies.set('user-name', newUser.fullName);
-        context.cookies.set('user-email', newUser.email);
-
+        // Return success with user data for JWT creation
         return {
           success: true,
-          redirect: '/dashboard'  // Add this to specify redirect path
+          user: newUser,
+          redirect: '/dashboard'
         };
       } catch (error) {
         if (error instanceof ActionError) throw error;
@@ -80,6 +74,85 @@ export const server = {
         throw new ActionError({
           code: "UNAUTHORIZED",
           message: 'Une erreur est survenue lors de l\'inscription',
+        });
+      }
+    }
+  }),
+
+  login: defineAction({
+    accept: 'form',
+    input: z.object({
+      email: z.string().email("Format d'email invalide"),
+      password: z.string().min(1, "Le mot de passe est requis"),
+    }),
+
+    handler: async (input, context) => {
+      try {
+        // Find user
+        const user = await db
+          .select()
+          .from(User)
+          .where(eq(User.email, input.email))
+          .get();
+
+        if (!user) {
+          throw new ActionError({
+            code: 'UNAUTHORIZED',
+            message: 'Email ou mot de passe incorrect',
+          });
+        }
+
+        // Verify password
+        const isValidPassword = await bcrypt.compare(input.password, user.passwordHash);
+        if (!isValidPassword) {
+          throw new ActionError({
+            code: 'UNAUTHORIZED',
+            message: 'Email ou mot de passe incorrect',
+          });
+        }
+
+        // Check if user is active
+        if (!user.isActive) {
+          throw new ActionError({
+            code: 'UNAUTHORIZED',
+            message: 'Compte désactivé. Contactez le support.',
+          });
+        }
+
+        // Return success with user data for JWT creation
+        return {
+          success: true,
+          user,
+          redirect: '/dashboard'
+        };
+      } catch (error) {
+        if (error instanceof ActionError) throw error;
+
+        console.error('Login error:', error);
+        throw new ActionError({
+          code: "UNAUTHORIZED",
+          message: 'Une erreur est survenue lors de la connexion',
+        });
+      }
+    }
+  }),
+
+  logout: defineAction({
+    accept: 'form',
+    input: z.object({}), // No input needed for logout
+
+    handler: async (input, context) => {
+      try {
+        // Return success and let middleware handle cookie cleanup
+        return {
+          success: true,
+          redirect: '/'
+        };
+      } catch (error) {
+        console.error('Logout error:', error);
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: 'Une erreur est survenue lors de la déconnexion',
         });
       }
     }

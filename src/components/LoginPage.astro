@@ -71,9 +71,10 @@ import background from "../assets/background.svg";
           </div>
 
           <button
+            type="submit"
             class="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
           >
-            <a href="/dashboard"> Se connecter </a>
+            Se connecter
           </button>
         </form>
 
@@ -90,33 +91,3 @@ import background from "../assets/background.svg";
     </div>
   </main>
 </div>
-
-<script>
-  // Client-side form handling
-  const form = document.getElementById("signupForm");
-
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target as HTMLFormElement);
-    const data = Object.fromEntries(formData.entries());
-
-    // Add your form submission logic here
-    try {
-      // Example: Send data to your API
-      // const response = await fetch('/api/signup', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(data),
-      // });
-
-      console.log("Form data:", data);
-      // Handle successful signup
-    } catch (error) {
-      console.error("Signup error:", error);
-      // Handle error
-    }
-  });
-</script>

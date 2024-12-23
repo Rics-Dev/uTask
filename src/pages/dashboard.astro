@@ -1,15 +1,8 @@
 ---
 export const prerender = false;
-// Add session check at the top
-const sessionId = Astro.cookies.get("session-id");
-if (!sessionId?.value) {
-  console.log("User not logged in");
-  return Astro.redirect("/login");
-}
 
-const userName = Astro.cookies.get("user-name")?.value;
-const userEmail = Astro.cookies.get("user-email")?.value;
-
+import { actions, isInputError } from "astro:actions";
+const user = Astro.locals.user;
 import { db, Task, Project, Comment } from "astro:db";
 import Layout from "../layouts/Layout.astro";
 import {
@@ -37,20 +30,25 @@ const comments = await db.select().from(Comment);
             <h1 class="text-2xl font-bold text-gray-900">Tableau de bord</h1>
           </div>
           <div class="flex items-center space-x-4">
-            <!-- Add user info and logout button -->
             <div class="flex items-center space-x-4">
               <div class="text-sm text-gray-600">
-                <p class="font-medium">{userName}</p>
-                <p class="text-xs">{userEmail}</p>
+                {
+                  user ? (
+                    <p class="font-medium">{user.fullName}</p>
+                    <p class="text-xs">{user.email}</p>
+                  ) : (
+                    <p class="text-xs">User not authenticated</p>
+                  )
+                }
               </div>
-              <form action="/api/logout" method="POST">
+        <form method="POST" action={actions.logout}>
                 <button
                   type="submit"
                   class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   Déconnexion
                 </button>
-              </form>
+</form>
             </div>
             <button
               class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
