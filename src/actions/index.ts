@@ -4,7 +4,6 @@ import { z } from 'astro:schema';
 import bcrypt from 'bcryptjs';
 import { db, User, Organization, OrganizationMember } from 'astro:db';
 import { eq } from 'astro:db';
-import { randomUUID } from "node:crypto";
 
 export const server = {
   signup: defineAction({
@@ -20,7 +19,7 @@ export const server = {
       path: ["confirmPassword"]
     }),
 
-    handler: async (input, context) => {
+    handler: async (input) => {
       console.log('Received input:', input);
       try {
         const existingUser = await db
@@ -70,7 +69,6 @@ export const server = {
       } catch (error) {
         if (error instanceof ActionError) throw error;
 
-        console.error('Signup error:', error);
         throw new ActionError({
           code: "UNAUTHORIZED",
           message: 'Une erreur est survenue lors de l\'inscription',
@@ -86,7 +84,7 @@ export const server = {
       password: z.string().min(1, "Le mot de passe est requis"),
     }),
 
-    handler: async (input, context) => {
+    handler: async (input) => {
       try {
         // Find user
         const user = await db
@@ -95,10 +93,11 @@ export const server = {
           .where(eq(User.email, input.email))
           .get();
 
+
         if (!user) {
           throw new ActionError({
             code: 'UNAUTHORIZED',
-            message: 'Email ou mot de passe incorrect',
+            message: "Utilisateur n'existe pas",
           });
         }
 
@@ -107,19 +106,11 @@ export const server = {
         if (!isValidPassword) {
           throw new ActionError({
             code: 'UNAUTHORIZED',
-            message: 'Email ou mot de passe incorrect',
+            message: 'Mot de passe incorrect',
           });
         }
 
-        // Check if user is active
-        if (!user.isActive) {
-          throw new ActionError({
-            code: 'UNAUTHORIZED',
-            message: 'Compte désactivé. Contactez le support.',
-          });
-        }
 
-        // Return success with user data for JWT creation
         return {
           success: true,
           user,
@@ -139,14 +130,16 @@ export const server = {
 
   logout: defineAction({
     accept: 'form',
-    input: z.object({}), // No input needed for logout
-
     handler: async (input, context) => {
       try {
-        // Return success and let middleware handle cookie cleanup
+        // Clear cookies
+        context.cookies.delete("auth-token");
+        context.cookies.delete("session-id");
+
+        // Return success with redirect
         return {
           success: true,
-          redirect: '/'
+          redirect: "/",
         };
       } catch (error) {
         console.error('Logout error:', error);

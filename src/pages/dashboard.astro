@@ -1,15 +1,18 @@
 ---
 export const prerender = false;
 
-import { actions, isInputError } from "astro:actions";
+import { actions } from "astro:actions";
+const result = Astro.getActionResult(actions.logout); // Get action result
+
+if (result && !result.error) {
+  return Astro.redirect(`/`);
+}
 const user = Astro.locals.user;
-import { db, Task, Project, Comment } from "astro:db";
+import { db, Task, Project  } from "astro:db";
 import Layout from "../layouts/Layout.astro";
 import {
-  CheckSquare,
   Calendar,
   Users,
-  BarChart2,
   Plus,
   Clock,
   AlertCircle,
@@ -18,7 +21,6 @@ import {
 
 const tasks = await db.select().from(Task);
 const projects = await db.select().from(Project);
-const comments = await db.select().from(Comment);
 ---
 
 <Layout>
@@ -41,14 +43,14 @@ const comments = await db.select().from(Comment);
                   )
                 }
               </div>
-        <form method="POST" action={actions.logout}>
+              <form method="POST" action={actions.logout} data-astro-reload data-astro-history="replace">
                 <button
                   type="submit"
                   class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   Déconnexion
                 </button>
-</form>
+              </form>
             </div>
             <button
               class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
@@ -200,4 +202,3 @@ const comments = await db.select().from(Comment);
     </main>
   </div>
 </Layout>
-};
