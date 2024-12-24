@@ -1,0 +1,43 @@
+---
+interface Props {
+  id?: string;
+}
+
+const { id = "loadingSpinner" } = Astro.props;
+---
+
+<span
+  id={id}
+  class="hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+>
+  <div class="bar-spinner"></div>
+</span>
+
+<style>
+  .bar-spinner {
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  .bar-spinner::after {
+    content: "";
+    position: absolute;
+    width: 40%;
+    height: 100%;
+    background: white;
+    animation: slide 1s infinite ease-in-out;
+  }
+
+  @keyframes slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(250%);
+    }
+  }
+</style>

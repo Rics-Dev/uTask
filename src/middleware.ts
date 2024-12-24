@@ -48,7 +48,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const { action } = getActionContext(context);
     const result = await action?.handler();
 
-    if (result?.data.user) {
+
+    if (!result?.error && result?.data.user) {
       const token = await generateAuthToken({
         userId: result.data.user.id,
         email: result.data.user.email,
@@ -74,26 +75,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect(result.data.redirect || "/dashboard");
     }
     // Handle failure
-    // return new Response("Authentication failed", { status: 401 });
     return next();
   }
 
 
 
 
-  // if (action?.calledFrom === "form") {
-  //   if (action.name === "logout") {
-  //     // Clear token on logout
-  //     return new Response(null, {
-  //       status: 302,
-  //       headers: {
-  //         "Set-Cookie": `auth-token=; Path=/; HttpOnly; Max-Age=0;`,
-  //         Location: "/",
-  //       },
-  //     });
-  //   }
-  //
-  // }
 
   // Handle authentication for protected routes
   if (protectedRoutes.includes(context.url.pathname)) {

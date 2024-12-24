@@ -1,5 +1,5 @@
 ---
-
+import FadingSpinner from "./spinners/FadingSpinner.astro";
 ---
 
 <header
@@ -18,19 +18,80 @@
     </a>
     <div class="flex gap-4">
       <a
+        id="loginButton"
         data-astro-reload
         href="/login"
-        class="px-6 py-2.5 rounded-full bg-white/80 text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium shadow-sm"
+        class="relative min-w-[120px] px-6 py-2.5 rounded-full bg-white/80 text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium shadow-sm"
       >
-        Connexion
+        <span id="loginButtonText">Connexion</span>
+        <FadingSpinner id="loginSpinner" color="#2563eb" />
       </a>
       <a
+        id="signupButton"
         data-astro-reload
         href="/signup"
-        class="px-6 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 font-medium shadow-md"
+        class="relative min-w-[120px] px-6 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 font-medium shadow-md"
       >
-        S'inscrire
+        <span id="signupButtonText">S'inscrire</span>
+        <FadingSpinner id="signupSpinner" color="#ffffff" />
       </a>
     </div>
   </nav>
 </header>
+
+<script>
+  function setupFormHandlers() {
+    const buttons = ["login", "signup"];
+
+    buttons.forEach((type) => {
+      const button = document.getElementById(
+        `${type}Button`,
+      ) as HTMLFormElement;
+      const buttonText = document.getElementById(`${type}ButtonText`);
+      const loadingSpinner = document.getElementById(`${type}Spinner`);
+
+      function showLoading() {
+        if (buttonText && loadingSpinner && button) {
+          buttonText.classList.add("fade-exit");
+          setTimeout(() => {
+            buttonText.classList.add("hidden");
+            loadingSpinner.classList.remove("hidden");
+            loadingSpinner.classList.add("fade-enter");
+            button.disabled = true;
+          }, 200);
+        }
+      }
+
+      function hideLoading() {
+        if (buttonText && loadingSpinner && button) {
+          loadingSpinner.classList.add("fade-exit");
+          setTimeout(() => {
+            loadingSpinner.classList.add("hidden");
+            loadingSpinner.classList.remove("fade-enter");
+            buttonText.classList.remove("hidden");
+            buttonText.classList.remove("fade-exit");
+            buttonText.classList.add("fade-enter");
+            button.disabled = false;
+          }, 200);
+        }
+      }
+
+      if (button) {
+        button.addEventListener("click", showLoading);
+      }
+
+      // Reset state on page load/reload
+      hideLoading();
+
+      // Handle Astro view transitions
+      document.addEventListener("astro:before-preparation", showLoading);
+      document.addEventListener("astro:after-preparation", hideLoading);
+    });
+  }
+
+  // Run setup on initial load
+  setupFormHandlers();
+
+  // Re-run setup after view transitions
+  document.addEventListener("astro:after-swap", setupFormHandlers);
+</script>
