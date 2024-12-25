@@ -1,11 +1,10 @@
 ---
-export const prerender = false;
-
 import { actions } from "astro:actions";
 
-const result = Astro.getActionResult(actions.login); // Get action result
+const result = Astro.getActionResult(actions.login);
+
 if (result && !result.error) {
-  return Astro.redirect(`/dashboard`);
+  return Astro.redirect(result.data.redirect);
 }
 import background from "../assets/background.svg";
 import Layout from "../layouts/loginLayout.astro";

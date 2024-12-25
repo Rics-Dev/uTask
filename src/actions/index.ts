@@ -1,9 +1,35 @@
-// src/actions/index.ts
 import { defineAction, ActionError } from 'astro:actions';
 import { z } from 'astro:schema';
 import bcrypt from 'bcryptjs';
 import { db, User, Organization, OrganizationMember } from 'astro:db';
 import { eq } from 'astro:db';
+import { SignJWT, jwtVerify } from 'jose';
+import { randomUUID } from 'crypto';
+
+
+const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
+
+// Helper functions for token management
+const generateAuthToken = async (payload: any): Promise<string> => {
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("2h")
+    .sign(secret);
+};
+
+
+
+const verifyAuthToken = async (token?: string): Promise<any> => {
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    return payload;
+  } catch (error) {
+    return null;
+  }
+};
+
 
 export const server = {
   signup: defineAction({
@@ -19,7 +45,7 @@ export const server = {
       path: ["confirmPassword"]
     }),
 
-    handler: async (input) => {
+    handler: async (input, context) => {
       console.log('Received input:', input);
       try {
         const existingUser = await db
@@ -60,6 +86,28 @@ export const server = {
           role: 'admin',
         });
 
+        // Generate authentication token
+        const token = await generateAuthToken({
+          userId: newUser.id,
+          email: newUser.email,
+          fullName: newUser.fullName,
+        });
+
+        // Set cookies
+        context.cookies.set("auth-token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+        });
+
+        context.cookies.set("session-id", randomUUID(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+        });
+
         // Return success with user data for JWT creation
         return {
           success: true,
@@ -84,7 +132,7 @@ export const server = {
       password: z.string().min(1, "Le mot de passe est requis"),
     }),
 
-    handler: async (input) => {
+    handler: async (input, context) => {
       try {
         // Find user
         const user = await db
@@ -111,6 +159,29 @@ export const server = {
         }
 
 
+        // Generate authentication token
+        const token = await generateAuthToken({
+          userId: user.id,
+          email: user.email,
+          fullName: user.fullName,
+        });
+
+        // Set cookies
+        context.cookies.set("auth-token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+        });
+
+        context.cookies.set("session-id", randomUUID(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+        });
+
+
         return {
           success: true,
           user,
@@ -125,6 +196,16 @@ export const server = {
           message: 'Une erreur est survenue lors de la connexion',
         });
       }
+    }
+  }),
+
+
+  verifyAuth: defineAction({
+    input: z.object({}),  // explicitly declare empty input schema
+    handler: async (input, context) => {
+      const token = context.cookies.get("auth-token")?.value;
+      const payload = await verifyAuthToken(token);
+      return { isAuthenticated: !!payload, user: payload };
     }
   }),
 

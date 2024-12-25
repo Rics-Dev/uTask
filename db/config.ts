@@ -73,6 +73,10 @@ const Task = defineTable({
     status: column.text(), // 'not_started', 'in_progress', 'waiting', 'completed'
     estimatedHours: column.number(),
     actualHours: column.number(),
+    labels: column.text(), // Pour les étiquettes/catégories
+    progress: column.number(), // Pour la barre de progression (0-100)
+    isRecurring: column.boolean(), // Pour les tâches récurrentes
+    recurringPattern: column.text(), // Pattern de récurrence (daily, weekly, etc.)
   }
 });
 
@@ -112,6 +116,23 @@ const Notification = defineTable({
 });
 
 
+const Calendar = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true }),
+    userId: column.number({ references: () => User.columns.id }),
+    eventTitle: column.text(),
+    description: column.text(),
+    startDate: column.date(),
+    endDate: column.date(),
+    isRecurring: column.boolean(),
+    recurringPattern: column.text(),
+    reminderTime: column.date(),
+    projectId: column.number({ references: () => Project.columns.id }),
+    taskId: column.number({ references: () => Task.columns.id }),
+  }
+});
+
+
 export default defineDb({
   tables: {
     User,
@@ -123,5 +144,6 @@ export default defineDb({
     TaskDependency,
     Comment,
     Notification,
+    Calendar,
   }
 });

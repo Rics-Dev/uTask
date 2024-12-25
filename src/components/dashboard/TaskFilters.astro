@@ -1,0 +1,62 @@
+---
+const priorities = ["high", "medium", "low"];
+const statuses = ["not_started", "in_progress", "waiting", "completed"];
+---
+
+<div class="bg-white rounded-xl shadow-sm p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+
+  <div class="space-y-4">
+    <!-- Priorité -->
+    <div>
+      <label class="text-sm font-medium text-gray-700">Priorité</label>
+      <div class="space-y-2 mt-2">
+        {
+          priorities.map((priority) => (
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="rounded text-blue-600"
+                value={priority}
+              />
+              <span class="ml-2 text-sm text-gray-600 capitalize">
+                {priority}
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Statut -->
+    <div>
+      <label class="text-sm font-medium text-gray-700">Statut</label>
+      <div class="space-y-2 mt-2">
+        {
+          statuses.map((status) => (
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="rounded text-blue-600"
+                value={status}
+              />
+              <span class="ml-2 text-sm text-gray-600 capitalize">
+                {status.replace("_", " ")}
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div>
+      <label class="text-sm font-medium text-gray-700">Échéance</label>
+      <select class="mt-2 w-full rounded-md border-gray-300">
+        <option>Aujourd'hui</option>
+        <option>Cette semaine</option>
+        <option>Ce mois</option>
+      </select>
+    </div>
+  </div>
+</div>

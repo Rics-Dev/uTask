@@ -114,6 +114,10 @@ export default async function () {
       estimatedHours: 20,
       actualHours: 0,
       dueDate: new Date('2024-01-15'),
+      labels: 'text',
+      progress: 0,
+      isRecurring: false,
+      recurringPattern: 'daily',
     },
     {
       id: 2,
@@ -127,6 +131,10 @@ export default async function () {
       estimatedHours: 40,
       actualHours: 0,
       dueDate: new Date('2024-02-15'),
+      labels: 'text',
+      progress: 0,
+      isRecurring: false,
+      recurringPattern: 'daily',
     }
   ]);
 

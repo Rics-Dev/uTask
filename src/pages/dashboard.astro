@@ -1,70 +1,37 @@
 ---
-export const prerender = false;
-
 import { actions } from "astro:actions";
 const result = Astro.getActionResult(actions.logout); // Get action result
-
 if (result && !result.error) {
   return Astro.redirect(`/`);
 }
 const user = Astro.locals.user;
-import { db, Task, Project  } from "astro:db";
+
 import Layout from "../layouts/dashboardLayout.astro";
 import {
-  Calendar,
   Users,
-  Plus,
   Clock,
   AlertCircle,
   CheckCircle,
+  Filter,
+  Calendar,
+  Bell,
+  Search,
+  Plus,
 } from "lucide-astro";
 
-const tasks = await db.select().from(Task);
-const projects = await db.select().from(Project);
+import DashHeader from "../components/dashboard/DashHeader.astro";
+import TaskGrid from "../components/dashboard/TaskGrid.astro";
+import ProjectGrid from "../components/dashboard/ProjectGrid.astro";
+import TaskFilters from "../components/dashboard/TaskFilters.astro";
+import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
 ---
 
 <Layout>
   <div class="min-h-screen bg-gray-50">
-    <nav class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-gray-900">Tableau de bord</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-4">
-              <div class="text-sm text-gray-600">
-                {
-                  user ? (
-                    <p class="font-medium">{user.fullName}</p>
-                    <p class="text-xs">{user.email}</p>
-                  ) : (
-                    <p class="text-xs">User not authenticated</p>
-                  )
-                }
-              </div>
-              <form method="POST" action={actions.logout} data-astro-reload data-astro-history="replace">
-                <button
-                  type="submit"
-                  class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Déconnexion
-                </button>
-              </form>
-            </div>
-            <button
-              class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
-            >
-              <Plus class="w-5 h-5" />
-              <span>Nouvelle Tâche</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </nav>
-
+    {/* Header */}
+    <DashHeader />
     {/* Main Content */}
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 py-8">
       {/* Stats Overview */}
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-sm p-6">
@@ -116,89 +83,133 @@ const projects = await db.select().from(Project);
         </div>
       </div>
 
-      {/* Tasks and Projects Grid */}
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Tasks */}
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg font-semibold text-gray-900">Tâches Récentes</h2>
-            <button class="text-blue-600 hover:text-blue-700">Voir tout</button>
-          </div>
-          <div class="space-y-4">
-            {
-              tasks.map((task) => (
-                <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-medium text-gray-900">{task.title}</h3>
-                    <span
-                      class={`px-2 py-1 rounded-full text-xs ${
-                        task.priority === "high"
-                          ? "bg-red-100 text-red-800"
-                          : task.priority === "medium"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {task.priority}
-                    </span>
-                  </div>
-                  <div class="flex items-center justify-between text-sm text-gray-500">
-                    <div class="flex items-center space-x-2">
-                      <Users class="w-4 h-4" />
-                      <span>{task.assignedTo}</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <Calendar class="w-4 h-4" />
-                      <span>{task.dueDate}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            }
-          </div>
+      <!-- Nouvelle section: Actions rapides -->
+      <div class="flex justify-between items-center mb-6" client:load>
+        <div class="flex space-x-4">
+          <button
+            id="newTaskBtn"
+            class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus class="w-4 h-4 mr-2" />
+            Nouvelle tâche
+          </button>
+          <button
+            id="newProjectBtn"
+            class="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            <Plus class="w-4 h-4 mr-2" />
+            Nouveau projet
+          </button>
         </div>
 
-        {/* Active Projects */}
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg font-semibold text-gray-900">Projets Actifs</h2>
-            <button class="text-blue-600 hover:text-blue-700">Voir tout</button>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <input
+              type="search"
+              placeholder="Rechercher..."
+              class="pl-10 pr-4 py-2 border rounded-lg"
+            />
+            <Search class="w-4 h-4 text-gray-400 absolute left-3 top-3" />
           </div>
-          <div class="space-y-6">
-            {
-              projects.map((project) => {
-                const totalTasks = tasks.filter(
-                  (task) => task.projectId === project.id,
-                ).length;
-                const completedTasks = tasks.filter(
-                  (task) =>
-                    task.projectId === project.id &&
-                    task.status === "completed",
-                ).length;
-                const progress =
-                  totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-                return (
-                  <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                      <h3 class="font-medium text-gray-900">{project.name}</h3>
-                      <span class="text-sm text-gray-500">
-                        {completedTasks}/{totalTasks} tâches
-                      </span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        class="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })
-            }
-          </div>
+          <button class="relative">
+            <Bell class="w-6 h-6 text-gray-600" />
+            <span
+              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+            >
+              3
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-12 gap-8">
+        <!-- Colonne de gauche: Filtres + Calendrier -->
+        <div class="col-span-3 space-y-6">
+          <TaskFilters />
+          <!-- <MiniCalendar client:load /> -->
+          <!-- <NotificationCenter client:load /> -->
+        </div>
+
+        <!-- Colonne centrale: Tâches -->
+        <div class="col-span-5">
+          <TaskGrid
+            server:defer
+            showFilters={true}
+            showSort={true}
+            showSearch={true}
+            view="detailed"
+          />
+        </div>
+
+        <!-- Colonne droite: Projets -->
+        <div class="col-span-4">
+          <ProjectGrid
+            server:defer
+            showProgress={true}
+            showMembers={true}
+            showDeadlines={true}
+          />
         </div>
       </div>
     </main>
+    <!-- Ajout des modales -->
+    <NewTaskModal />
+    <!-- <NewProjectModal /> -->
   </div>
 </Layout>
+
+<script>
+  // Gestion des événements pour les modales
+  document.addEventListener("DOMContentLoaded", () => {
+    const newTaskBtn = document.getElementById("newTaskBtn");
+    const newProjectBtn = document.getElementById("newProjectBtn");
+
+    if (newTaskBtn) {
+      newTaskBtn.addEventListener("click", () => {
+        const modal = document.getElementById("newTaskModal");
+        if (modal) modal.classList.remove("hidden");
+      });
+    }
+
+    if (newProjectBtn) {
+      newProjectBtn.addEventListener("click", () => {
+        const modal = document.getElementById("newProjectModal");
+        if (modal) modal.classList.remove("hidden");
+      });
+    }
+
+    // Fermeture des modales en cliquant en dehors
+    document.addEventListener("click", (e) => {
+      const taskModal = document.getElementById("newTaskModal");
+      const projectModal = document.getElementById("newProjectModal");
+
+      if (
+        taskModal &&
+        !taskModal.contains(e.target) &&
+        e.target !== newTaskBtn
+      ) {
+        taskModal.classList.add("hidden");
+      }
+
+      if (
+        projectModal &&
+        !projectModal.contains(e.target) &&
+        e.target !== newProjectBtn
+      ) {
+        projectModal.classList.add("hidden");
+      }
+    });
+
+    // Gestion de la touche Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const taskModal = document.getElementById("newTaskModal");
+        const projectModal = document.getElementById("newProjectModal");
+
+        if (taskModal) taskModal.classList.add("hidden");
+        if (projectModal) projectModal.classList.add("hidden");
+      }
+    });
+  });
+</script>

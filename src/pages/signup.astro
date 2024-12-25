@@ -1,5 +1,11 @@
 ---
-export const prerender = false;
+import { actions } from "astro:actions";
+
+const result = Astro.getActionResult(actions.signup); // Get action result
+
+if (result && !result.error) {
+  return Astro.redirect(result.data.redirect);
+}
 
 import SignupForm from "../components/SignupForm.astro";
 import background from "../assets/background.svg";
