@@ -15,7 +15,7 @@
     "@astrojs/vercel": "^8.0.1",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "astro": "^5.0.5",
+    "astro": "^5.0.4",
     "astro-icon": "^1.1.5",
     "bcryptjs": "^2.4.3",
     "jose": "^5.9.6",
