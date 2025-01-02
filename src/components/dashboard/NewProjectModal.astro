@@ -1,0 +1,375 @@
+---
+// NewProjectModal.astro
+import { actions } from "astro:actions";
+import { db, User } from "astro:db";
+import FadingSpinner from "../spinners/FadingSpinner.astro";
+
+const result = Astro.getActionResult(actions.addProject);
+const errorMessage = result?.error?.message || null;
+const users = await db.select().from(User);
+---
+
+<div
+  id="newProjectModal"
+  class="fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full opacity-0 pointer-events-none transition-all duration-300 ease-in-out"
+>
+  <div
+    class="relative top-20 mx-auto p-6 border w-[32rem] shadow-xl rounded-xl bg-white transform scale-95 opacity-0 transition-all duration-300 ease-in-out"
+  >
+    <div class="mt-2">
+      <h3 class="text-xl font-semibold text-gray-900 mb-6">Nouveau projet</h3>
+      <form
+        method="POST"
+        action={actions.addProject}
+        id="addProjectForm"
+        class="space-y-5"
+      >
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700"
+            >Titre du projet</label
+          >
+          <input
+            type="text"
+            name="title"
+            required
+            class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+            placeholder="Entrez le titre du projet..."
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700"
+            >Description</label
+          >
+          <textarea
+            name="description"
+            rows="4"
+            class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm resize-none"
+            placeholder="Décrivez les objectifs et la portée du projet..."
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700"
+              >Date de début</label
+            >
+            <input
+              type="date"
+              name="startDate"
+              required
+              class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700"
+              >Date de fin prévue</label
+            >
+            <input
+              type="date"
+              name="endDate"
+              required
+              class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700"
+            >Responsable du projet</label
+          >
+          <select
+            name="projectManager"
+            required
+            class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+          >
+            <option value="">Sélectionnez un responsable</option>
+            {
+              users.map((user) => (
+                <option value={user.id}>{user.fullName}</option>
+              ))
+            }
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700"
+            >Membres du projet</label
+          >
+          <div class="mt-1 border border-gray-300 rounded-lg">
+            <div class="p-3 max-h-48 overflow-y-auto">
+              {
+                users.map((user) => (
+                  <label class="flex items-center p-2 hover:bg-gray-50 rounded-lg">
+                    <input
+                      type="checkbox"
+                      name="members"
+                      value={user.id}
+                      class="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                    />
+                    <span class="ml-3 text-sm text-gray-700">
+                      {user.fullName}
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700"
+              >Statut initial</label
+            >
+            <select
+              name="status"
+              class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+            >
+              <option value="planning">En planification</option>
+              <option value="active">Actif</option>
+              <option value="on_hold">En attente</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700"
+              >Priorité</label
+            >
+            <select
+              name="priority"
+              class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+            >
+              <option value="low">Basse</option>
+              <option value="medium" selected>Moyenne</option>
+              <option value="high">Haute</option>
+            </select>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end space-x-4 pt-4 mt-6 border-t border-gray-100"
+        >
+          <button
+            type="button"
+            id="closeProjectModalBtn"
+            class="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors rounded-lg hover:bg-gray-100"
+          >
+            Annuler
+          </button>
+          <button
+            id="submitButton"
+            type="submit"
+            class="relative min-w-[120px] px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          >
+            <span id="buttonText">Créer le projet</span>
+            <FadingSpinner color="#ffffff" />
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { navigate } from "astro:transitions/client";
+
+  function showToast(message: string) {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toastMessage");
+    if (toast && toastMessage) {
+      toastMessage.textContent = message;
+      toast.classList.remove("translate-x-full");
+      toast.classList.remove("right-0");
+      toast.classList.add("right-6");
+
+      setTimeout(() => {
+        toast.classList.add("translate-x-full");
+        toast.classList.remove("right-6");
+        toast.classList.add("right-0");
+      }, 3000);
+    }
+  }
+  document.addEventListener("astro:page-load", () => {
+    const form = document.getElementById("addProjectForm") as HTMLFormElement;
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        showLoading();
+        try {
+          const formData = new FormData(form);
+          // Handle multiple selected members
+          const selectedMembers = Array.from(formData.getAll("members"));
+          formData.delete("members");
+          selectedMembers.forEach((member) => {
+            formData.append("members", member.toString());
+          });
+
+          const response = await fetch(form.action, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            closeModal("newProjectModal");
+            form.reset();
+            hideLoading();
+            showToast("Projet créé avec succès!");
+            navigate("/dashboard");
+          }
+        } catch (error) {
+          console.error("Form submission error:", error);
+          hideLoading();
+        }
+      });
+    }
+
+    // Loading state management
+    const submitButton = document.getElementById(
+      "submitButton",
+    ) as HTMLFormElement | null;
+    const buttonText = document.getElementById(
+      "buttonText",
+    ) as HTMLFormElement | null;
+    const loadingSpinner = document.getElementById(
+      "loadingSpinner",
+    ) as HTMLFormElement | null;
+
+    function showLoading() {
+      if (buttonText && loadingSpinner && submitButton) {
+        buttonText.classList.add("fade-exit");
+        setTimeout(() => {
+          buttonText.classList.add("hidden");
+          loadingSpinner.classList.remove("hidden");
+          loadingSpinner.classList.add("fade-enter");
+          submitButton.disabled = true;
+        }, 200);
+      }
+    }
+
+    function hideLoading() {
+      if (buttonText && loadingSpinner && submitButton) {
+        loadingSpinner.classList.add("fade-exit");
+        setTimeout(() => {
+          loadingSpinner.classList.add("hidden");
+          loadingSpinner.classList.remove("fade-enter");
+          buttonText.classList.remove("hidden", "fade-exit");
+          buttonText.classList.add("fade-enter");
+          submitButton.disabled = false;
+        }, 200);
+      }
+    }
+
+    const closeModalBtn = document.querySelector("#closeProjectModalBtn");
+    if (!closeModalBtn) return;
+
+    closeModalBtn.addEventListener("click", () => {
+      closeModal("newProjectModal");
+    });
+
+    // Close modal when clicking outside
+    document
+      .querySelector("#newProjectModal")
+      ?.addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) {
+          closeModal("newProjectModal");
+        }
+      });
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModal("newProjectModal");
+      }
+    });
+
+    function closeModal(modalId: string) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.add("modal-hidden");
+        modal.classList.remove("modal-visible");
+      }
+    }
+
+    // Date validation
+    const startDateInput = document.querySelector(
+      'input[name="startDate"]',
+    ) as HTMLFormElement;
+    const endDateInput = document.querySelector(
+      'input[name="endDate"]',
+    ) as HTMLFormElement;
+
+    if (startDateInput && endDateInput) {
+      startDateInput.addEventListener("change", () => {
+        endDateInput.min = startDateInput.value;
+      });
+
+      endDateInput.addEventListener("change", () => {
+        startDateInput.max = endDateInput.value;
+      });
+    }
+  });
+</script>
+
+<style>
+  #newProjectModal.modal-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #newProjectModal.modal-visible > div {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #newProjectModal.modal-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #newProjectModal.modal-hidden > div {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  /* Custom date input styling */
+  input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+  }
+
+  /* Scrollbar styling */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+</style>

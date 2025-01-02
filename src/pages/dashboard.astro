@@ -4,14 +4,13 @@ const result = Astro.getActionResult(actions.logout); // Get action result
 if (result && !result.error) {
   return Astro.redirect(`/`);
 }
-const user = Astro.locals.user;
 
 import Layout from "../layouts/dashboardLayout.astro";
 import {
   Users,
   Clock,
-  AlertCircle,
   CheckCircle,
+  PauseCircle,
   Filter,
   Calendar,
   Bell,
@@ -24,14 +23,19 @@ import TaskGrid from "../components/dashboard/TaskGrid.astro";
 import ProjectGrid from "../components/dashboard/ProjectGrid.astro";
 import TaskFilters from "../components/dashboard/TaskFilters.astro";
 import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
+import NewProjectModal from "../components/dashboard/NewProjectModal.astro";
+import Toast from "../components/Toast.astro";
 ---
 
 <Layout>
   <div class="min-h-screen bg-gray-50">
+    <Toast />
+
     {/* Header */}
     <DashHeader />
     {/* Main Content */}
     <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 py-8">
+      <!-- <Counter client:load /> -->
       {/* Stats Overview */}
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-sm p-6">
@@ -49,11 +53,11 @@ import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">Tâches urgentes</p>
+              <p class="text-sm text-gray-500">Tâches en attentes</p>
               <p class="text-2xl font-bold text-gray-900">3</p>
             </div>
             <div class="bg-red-100 p-3 rounded-lg">
-              <AlertCircle class="w-6 h-6 text-red-600" />
+              <PauseCircle class="w-6 h-6 text-red-600" />
             </div>
           </div>
         </div>
@@ -84,7 +88,7 @@ import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
       </div>
 
       <!-- Nouvelle section: Actions rapides -->
-      <div class="flex justify-between items-center mb-6" client:load>
+      <div class="flex justify-between items-center mb-6">
         <div class="flex space-x-4">
           <button
             id="newTaskBtn"
@@ -155,61 +159,23 @@ import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
     </main>
     <!-- Ajout des modales -->
     <NewTaskModal />
-    <!-- <NewProjectModal /> -->
+    <NewProjectModal />
   </div>
 </Layout>
 
 <script>
-  // Gestion des événements pour les modales
-  document.addEventListener("DOMContentLoaded", () => {
-    const newTaskBtn = document.getElementById("newTaskBtn");
-    const newProjectBtn = document.getElementById("newProjectBtn");
-
-    if (newTaskBtn) {
-      newTaskBtn.addEventListener("click", () => {
-        const modal = document.getElementById("newTaskModal");
-        if (modal) modal.classList.remove("hidden");
-      });
+  document.addEventListener("astro:page-load", () => {
+    const newTask = document.querySelector("#newTaskBtn");
+    const newProject = document.querySelector("#newProjectBtn");
+    newTask?.addEventListener("click", () => openModal("newTaskModal"));
+    newProject?.addEventListener("click", () => openModal("newProjectModal"));
+    // Open the modal
+    function openModal(modalId: string) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove("modal-hidden");
+        modal.classList.add("modal-visible");
+      }
     }
-
-    if (newProjectBtn) {
-      newProjectBtn.addEventListener("click", () => {
-        const modal = document.getElementById("newProjectModal");
-        if (modal) modal.classList.remove("hidden");
-      });
-    }
-
-    // Fermeture des modales en cliquant en dehors
-    document.addEventListener("click", (e) => {
-      const taskModal = document.getElementById("newTaskModal");
-      const projectModal = document.getElementById("newProjectModal");
-
-      if (
-        taskModal &&
-        !taskModal.contains(e.target) &&
-        e.target !== newTaskBtn
-      ) {
-        taskModal.classList.add("hidden");
-      }
-
-      if (
-        projectModal &&
-        !projectModal.contains(e.target) &&
-        e.target !== newProjectBtn
-      ) {
-        projectModal.classList.add("hidden");
-      }
-    });
-
-    // Gestion de la touche Escape
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        const taskModal = document.getElementById("newTaskModal");
-        const projectModal = document.getElementById("newProjectModal");
-
-        if (taskModal) taskModal.classList.add("hidden");
-        if (projectModal) projectModal.classList.add("hidden");
-      }
-    });
   });
 </script>

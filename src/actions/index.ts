@@ -5,6 +5,8 @@ import { db, User, Organization, OrganizationMember } from 'astro:db';
 import { eq } from 'astro:db';
 import { SignJWT, jwtVerify } from 'jose';
 import { randomUUID } from 'crypto';
+import { addTask } from './addTask';
+import { addProject } from './addProject';
 
 
 const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
@@ -89,6 +91,7 @@ export const server = {
         // Generate authentication token
         const token = await generateAuthToken({
           userId: newUser.id,
+          orgId: newOrg.id,
           email: newUser.email,
           fullName: newUser.fullName,
         });
@@ -142,10 +145,26 @@ export const server = {
           .get();
 
 
+
+
         if (!user) {
           throw new ActionError({
             code: 'UNAUTHORIZED',
             message: "Utilisateur n'existe pas",
+          });
+        }
+
+        const organizationMember = await db
+          .select()
+          .from(OrganizationMember)
+          .where(eq(User.id, user.id))
+          .get();
+
+
+        if (!organizationMember) {
+          throw new ActionError({
+            code: 'UNAUTHORIZED',
+            message: "organization n'existe pas",
           });
         }
 
@@ -162,6 +181,7 @@ export const server = {
         // Generate authentication token
         const token = await generateAuthToken({
           userId: user.id,
+          orgId: organizationMember.orgId,
           email: user.email,
           fullName: user.fullName,
         });
@@ -230,5 +250,8 @@ export const server = {
         });
       }
     }
-  })
+  }),
+
+  addTask: addTask,
+  addProject: addProject,
 };

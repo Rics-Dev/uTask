@@ -64,13 +64,13 @@ const Task = defineTable({
     id: column.number({ primaryKey: true }),
     title: column.text(),
     description: column.text(),
+    priority: column.text(), // 'low', 'medium', 'high'
+    status: column.text(), // 'not_started', 'in_progress', 'waiting', 'completed'
     projectId: column.number({ references: () => Project.columns.id }),
     createdBy: column.number({ references: () => User.columns.id }),
     assignedTo: column.number({ references: () => User.columns.id }),
     createdAt: column.date({ default: new Date() }),
     dueDate: column.date(),
-    priority: column.text(), // 'low', 'medium', 'high', 'urgent'
-    status: column.text(), // 'not_started', 'in_progress', 'waiting', 'completed'
     estimatedHours: column.number(),
     actualHours: column.number(),
     labels: column.text(), // Pour les étiquettes/catégories

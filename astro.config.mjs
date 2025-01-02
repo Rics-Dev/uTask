@@ -7,12 +7,19 @@ import vercel from "@astrojs/vercel";
 
 import db from "@astrojs/db";
 
-import react from "@astrojs/react";
+
+
+import solidJs from "@astrojs/solid-js";
+
+
+
+import icon from "astro-icon";
+
 
 
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  integrations: [tailwind(), db(), react()],
+  integrations: [tailwind(), db(), solidJs(), icon()],
   adapter: vercel(),
 });
