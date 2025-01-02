@@ -157,7 +157,7 @@ export const server = {
         const organizationMember = await db
           .select()
           .from(OrganizationMember)
-          .where(eq(User.id, user.id))
+          .where(eq(OrganizationMember.userId, user.id))
           .get();
 
 
