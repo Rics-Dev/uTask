@@ -1,30 +1,62 @@
 ---
 import { actions } from "astro:actions";
+import { db, Task, User, Project, OrganizationMember, eq, and } from "astro:db";
+const user = Astro.locals.user;
+
+// Fetching data
+const users = await db.select().from(User);
+const projects = await db.select().from(Project);
+const tasks = await db.select().from(Task);
+
+// Get the current user's organization
+const currentOrg = await db
+  .select()
+  .from(OrganizationMember)
+  .where(eq(OrganizationMember.userId, Number(user?.userId)))
+  .get();
+
+console.log("currentOrg", currentOrg);
+
+let activeUsers: any[] = [];
+if (currentOrg) {
+  activeUsers = await db
+    .select()
+    .from(OrganizationMember)
+    .innerJoin(User, eq(OrganizationMember.userId, User.id))
+    .where(
+      and(
+        eq(OrganizationMember.orgId, currentOrg.orgId),
+        eq(User.isActive, true),
+      ),
+    )
+    .all();
+}
+
+console.log("activeUsers", activeUsers);
+
+import Layout from "../layouts/dashboardLayout.astro";
+import { Filter, Calendar, Bell, Search, Plus } from "lucide-astro";
+
+import DashHeader from "../components/dashboard/DashHeader.astro";
+import CurrentTasks from "../components/dashboard/CurrentTasks.tsx";
+import WaitingTasks from "../components/dashboard/WaitingTasks.tsx";
+import FinishedTasks from "../components/dashboard/FinishedTasks.tsx";
+import ActiveUsers from "../components/dashboard/ActiveUsers.tsx";
+import TaskGridS from "../components/dashboard/TaskGridS.tsx";
+import GenericTaskGrid from "../components/dashboard/GenericTaskGrid.astro";
+import ProjectGrid from "../components/dashboard/ProjectGrid.astro";
+import GenericProjectGrid from "../components/dashboard/GenericProjectGrid.astro";
+import TaskFilters from "../components/dashboard/TaskFilters.astro";
+import NewTaskButton from "../components/dashboard/NewTaskButton.tsx";
+import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
+import NewTaskModalS from "../components/dashboard/NewTaskModalS.tsx";
+import NewProjectModal from "../components/dashboard/NewProjectModal.astro";
+import Toast from "../components/Toast.astro";
+
 const result = Astro.getActionResult(actions.logout); // Get action result
 if (result && !result.error) {
   return Astro.redirect(`/`);
 }
-
-import Layout from "../layouts/dashboardLayout.astro";
-import {
-  Users,
-  Clock,
-  CheckCircle,
-  PauseCircle,
-  Filter,
-  Calendar,
-  Bell,
-  Search,
-  Plus,
-} from "lucide-astro";
-
-import DashHeader from "../components/dashboard/DashHeader.astro";
-import TaskGrid from "../components/dashboard/TaskGrid.astro";
-import ProjectGrid from "../components/dashboard/ProjectGrid.astro";
-import TaskFilters from "../components/dashboard/TaskFilters.astro";
-import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
-import NewProjectModal from "../components/dashboard/NewProjectModal.astro";
-import Toast from "../components/Toast.astro";
 ---
 
 <Layout>
@@ -38,65 +70,19 @@ import Toast from "../components/Toast.astro";
       <!-- <Counter client:load /> -->
       {/* Stats Overview */}
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Tâches en cours</p>
-              <p class="text-2xl font-bold text-gray-900">12</p>
-            </div>
-            <div class="bg-blue-100 p-3 rounded-lg">
-              <Clock class="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
+        <CurrentTasks client:load />
 
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Tâches en attentes</p>
-              <p class="text-2xl font-bold text-gray-900">3</p>
-            </div>
-            <div class="bg-red-100 p-3 rounded-lg">
-              <PauseCircle class="w-6 h-6 text-red-600" />
-            </div>
-          </div>
-        </div>
+        <WaitingTasks client:load />
 
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Tâches terminées</p>
-              <p class="text-2xl font-bold text-gray-900">28</p>
-            </div>
-            <div class="bg-green-100 p-3 rounded-lg">
-              <CheckCircle class="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
+        <FinishedTasks client:load />
 
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">Membres actifs</p>
-              <p class="text-2xl font-bold text-gray-900">8</p>
-            </div>
-            <div class="bg-purple-100 p-3 rounded-lg">
-              <Users class="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
+        <ActiveUsers users={activeUsers} client:load />
       </div>
 
       <!-- Nouvelle section: Actions rapides -->
       <div class="flex justify-between items-center mb-6">
         <div class="flex space-x-4">
-          <button
-            id="newTaskBtn"
-            class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Plus class="w-4 h-4 mr-2" />
-            Nouvelle tâche
-          </button>
+          <NewTaskButton projects={projects.length} client:load />
           <button
             id="newProjectBtn"
             class="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
@@ -137,13 +123,16 @@ import Toast from "../components/Toast.astro";
 
         <!-- Colonne centrale: Tâches -->
         <div class="col-span-5">
-          <TaskGrid
-            server:defer
-            showFilters={true}
-            showSort={true}
-            showSearch={true}
-            view="detailed"
-          />
+          <TaskGridS client:load tasks={tasks} />
+          <!-- <TaskGrid -->
+          <!--   server:defer -->
+          <!--   showFilters={true} -->
+          <!--   showSort={true} -->
+          <!--   showSearch={true} -->
+          <!--   view="detailed" -->
+          <!-- > -->
+          <!--   <GenericTaskGrid slot="fallback" /> -->
+          <!-- </TaskGrid> -->
         </div>
 
         <!-- Colonne droite: Projets -->
@@ -153,29 +142,36 @@ import Toast from "../components/Toast.astro";
             showProgress={true}
             showMembers={true}
             showDeadlines={true}
-          />
+          >
+            <GenericProjectGrid slot="fallback" />
+          </ProjectGrid>
         </div>
       </div>
+      <!-- Ajout des modales -->
+      <NewTaskModalS
+        user={user}
+        users={users}
+        projects={projects}
+        client:idle
+      />
+      <NewProjectModal />
     </main>
-    <!-- Ajout des modales -->
-    <NewTaskModal />
-    <NewProjectModal />
   </div>
-</Layout>
 
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const newTask = document.querySelector("#newTaskBtn");
-    const newProject = document.querySelector("#newProjectBtn");
-    newTask?.addEventListener("click", () => openModal("newTaskModal"));
-    newProject?.addEventListener("click", () => openModal("newProjectModal"));
-    // Open the modal
-    function openModal(modalId: string) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.classList.remove("modal-hidden");
-        modal.classList.add("modal-visible");
+  <script>
+    document.addEventListener("astro:page-load", () => {
+      const newTask = document.querySelector("#newTaskBtn");
+      const newProject = document.querySelector("#newProjectBtn");
+      newTask?.addEventListener("click", () => openModal("newTaskModal"));
+      newProject?.addEventListener("click", () => openModal("newProjectModal"));
+      // Open the modal
+      function openModal(modalId: string) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.remove("modal-hidden");
+          modal.classList.add("modal-visible");
+        }
       }
-    }
-  });
-</script>
+    });
+  </script>
+</Layout>

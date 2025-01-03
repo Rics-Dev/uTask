@@ -1,13 +1,14 @@
 ---
-import { actions } from "astro:actions";
+// import { actions } from "astro:actions";
 
-const result = Astro.getActionResult(actions.signup); // Get action result
+// const result = Astro.getActionResult(actions.signup); // Get action result
+//
+// if (result && !result.error) {
+//   return Astro.redirect(result.data.redirect);
+// }
 
-if (result && !result.error) {
-  return Astro.redirect(result.data.redirect);
-}
-
-import SignupForm from "../components/SignupForm.astro";
+// import SignupForm from "../components/SignupForm.astro";
+import SignupForm from "../components/SignupForm.tsx";
 import background from "../assets/background.svg";
 import Layout from "../layouts/signLayout.astro";
 ---
@@ -35,7 +36,7 @@ import Layout from "../layouts/signLayout.astro";
       <main
         class="flex flex-col items-center justify-center min-h-screen py-12 px-4"
       >
-        <SignupForm />
+        <SignupForm client:load />
       </main>
     </div>
   </div>

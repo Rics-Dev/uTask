@@ -3,12 +3,7 @@ import { actions } from "astro:actions";
 
 const result = Astro.getActionResult(actions.addTask); // Get action result
 const errorMessage = result?.error?.message || null; // Default null
-if (result && !result.error) {
-  console.log("Task added successfully!", result.data.task);
-}
-// NewTaskModal.astro
 import { db, User, Project } from "astro:db";
-import DotSpinner from "../spinners/DotSpinner.astro";
 import FadingSpinner from "../spinners/FadingSpinner.astro";
 const users = await db.select().from(User);
 const projects = await db.select().from(Project);
@@ -317,6 +312,7 @@ const projects = await db.select().from(Project);
 
 <script>
   import { navigate } from "astro:transitions/client";
+  import { addNanoTask } from "../../stores/taskStore.ts";
   function showToast(message: string) {
     const toast = document.getElementById("toast");
     const toastMessage = document.getElementById("toastMessage");

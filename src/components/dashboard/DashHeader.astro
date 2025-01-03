@@ -3,7 +3,6 @@ import { actions } from "astro:actions";
 const user = Astro.locals.user;
 ---
 
-
 <nav class="bg-white shadow-md">
   <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
@@ -15,8 +14,10 @@ const user = Astro.locals.user;
           <div class="text-sm text-gray-600">
             {
               user ? (
-                <p class="font-medium">{user.fullName}</p>
-                <p class="text-xs">{user.email}</p>
+                <>
+                  <p class="font-medium">{user.fullName}</p>
+                  <p class="text-xs">{user.email}</p>
+                </>
               ) : (
                 <p class="text-xs">User not authenticated</p>
               )

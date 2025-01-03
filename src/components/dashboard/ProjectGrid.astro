@@ -10,34 +10,42 @@ const projects = await db.select().from(Project);
   </div>
   <div class="space-y-6">
     {
-      projects.map((project) => {
-        const totalTasks = tasks.filter(
-          (task) => task.projectId === project.id,
-        ).length;
-        const completedTasks = tasks.filter(
-          (task) =>
-            task.projectId === project.id && task.status === "completed",
-        ).length;
-        const progress =
-          totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+      projects.length > 0 ? (
+        projects.map((project) => {
+          const totalTasks = tasks.filter(
+            (task) => task.projectId === project.id,
+          ).length;
+          const completedTasks = tasks.filter(
+            (task) =>
+              task.projectId === project.id && task.status === "completed",
+          ).length;
+          const progress =
+            totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-        return (
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-medium text-gray-900">{project.name}</h3>
-              <span class="text-sm text-gray-500">
-                {completedTasks}/{totalTasks} tâches
-              </span>
+          return (
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="font-medium text-gray-900">{project.name}</h3>
+                <span class="text-sm text-gray-500">
+                  {completedTasks}/{totalTasks} tâches
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  class="bg-blue-600 h-2 rounded-full"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
-              <div
-                class="bg-blue-600 h-2 rounded-full"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        );
-      })
+          );
+        })
+      ) : (
+        <div class="text-center text-gray-500 py-6">
+          <p>
+            Aucun projet disponible. Ajoutez un nouveau projet pour commencer.
+          </p>
+        </div>
+      )
     }
   </div>
 </div>

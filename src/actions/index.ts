@@ -46,10 +46,9 @@ export const server = {
       message: "Les mots de passe ne correspondent pas",
       path: ["confirmPassword"]
     }),
-
     handler: async (input, context) => {
-      console.log('Received input:', input);
       try {
+        // Check for existing user
         const existingUser = await db
           .select()
           .from(User)
@@ -63,6 +62,13 @@ export const server = {
           });
         }
 
+        // Check for existing organization
+        const existingOrg = await db
+          .select()
+          .from(Organization)
+          .where(eq(Organization.name, input.companyName))
+          .get();
+
         // Create user
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(input.password, salt);
@@ -75,23 +81,37 @@ export const server = {
           isActive: true,
         }).returning();
 
-        // Create organization
-        const [newOrg] = await db.insert(Organization).values({
-          name: input.companyName,
-          orgType: 'small',
-        }).returning();
+        let orgId;
 
-        // Create organization membership
-        await db.insert(OrganizationMember).values({
-          orgId: newOrg.id,
-          userId: newUser.id,
-          role: 'admin',
-        });
+        if (!existingOrg) {
+          // Create organization
+          const [newOrg] = await db.insert(Organization).values({
+            name: input.companyName,
+            orgType: 'small',
+          }).returning();
+
+          orgId = newOrg.id;
+
+          await db.insert(OrganizationMember).values({
+            orgId,
+            userId: newUser.id,
+            role: 'admin',
+          });
+        } else {
+          orgId = existingOrg.id;
+
+          // Create organization membership
+          await db.insert(OrganizationMember).values({
+            orgId,
+            userId: newUser.id,
+            role: 'admin',
+          });
+        }
 
         // Generate authentication token
         const token = await generateAuthToken({
           userId: newUser.id,
-          orgId: newOrg.id,
+          orgId,
           email: newUser.email,
           fullName: newUser.fullName,
         });
