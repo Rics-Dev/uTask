@@ -39,7 +39,24 @@ if (currentOrg) {
 
   // Get tasks from projects in the same organization
   tasks = await db
-    .select()
+    .select({
+      id: Task.id,
+      title: Task.title,
+      description: Task.description,
+      priority: Task.priority,
+      status: Task.status,
+      projectId: Task.projectId,
+      createdBy: Task.createdBy,
+      assignedTo: Task.assignedTo,
+      createdAt: Task.createdAt,
+      dueDate: Task.dueDate,
+      estimatedHours: Task.estimatedHours,
+      actualHours: Task.actualHours,
+      labels: Task.labels,
+      progress: Task.progress,
+      isRecurring: Task.isRecurring,
+      recurringPattern: Task.recurringPattern,
+    })
     .from(Task)
     .innerJoin(Project, eq(Task.projectId, Project.id))
     .where(eq(Project.orgId, currentOrg.orgId))
