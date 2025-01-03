@@ -1,37 +1,47 @@
 ---
 import { actions } from "astro:actions";
-import { db, Task, User, Project, OrganizationMember, eq, and } from "astro:db";
+import { db, Task, User, Project, OrganizationMember, eq } from "astro:db";
+
 const user = Astro.locals.user;
 
-// Fetching data
-const users = await db.select().from(User);
-const projects = await db.select().from(Project);
-const tasks = await db.select().from(Task);
-
-// Get the current user's organization
+// Get the current user's organization first
 const currentOrg = await db
   .select()
   .from(OrganizationMember)
   .where(eq(OrganizationMember.userId, Number(user?.userId)))
   .get();
 
-let activeUsers: any[] = [];
+// Initialize empty arrays in case no organization is found
+let users: any[] = [];
+let projects: any[] = [];
+let tasks: any[] = [];
+
 if (currentOrg) {
-  activeUsers = await db
+  users = await db
     .select()
     .from(OrganizationMember)
     .innerJoin(User, eq(OrganizationMember.userId, User.id))
-    .where(
-      and(
-        eq(OrganizationMember.orgId, currentOrg.orgId),
-        eq(User.isActive, true),
-      ),
-    )
+    .where(eq(OrganizationMember.orgId, currentOrg.orgId))
+    .all();
+
+  // Get projects from the same organization
+  projects = await db
+    .select()
+    .from(Project)
+    .where(eq(Project.orgId, currentOrg.orgId))
+    .all();
+
+  // Get tasks from projects in the same organization
+  tasks = await db
+    .select()
+    .from(Task)
+    .innerJoin(Project, eq(Task.projectId, Project.id))
+    .where(eq(Project.orgId, currentOrg.orgId))
     .all();
 }
 
 import Layout from "../layouts/dashboardLayout.astro";
-import { Filter, Calendar, Bell, Search, Plus, Menu } from "lucide-astro";
+import { Bell, Search, Menu } from "lucide-astro";
 
 import DashHeader from "../components/dashboard/DashHeader.astro";
 import CurrentTasks from "../components/dashboard/CurrentTasks.tsx";
@@ -39,13 +49,10 @@ import WaitingTasks from "../components/dashboard/WaitingTasks.tsx";
 import FinishedTasks from "../components/dashboard/FinishedTasks.tsx";
 import ActiveUsers from "../components/dashboard/ActiveUsers.tsx";
 import TaskGridS from "../components/dashboard/TaskGridS.tsx";
-import GenericTaskGrid from "../components/dashboard/GenericTaskGrid.astro";
 import ProjectGrid from "../components/dashboard/ProjectGrid.tsx";
-import GenericProjectGrid from "../components/dashboard/GenericProjectGrid.astro";
 import TaskFilters from "../components/dashboard/TaskFilters.tsx";
 import NewTaskButton from "../components/dashboard/NewTaskButton.tsx";
 import NewProjectButton from "../components/dashboard/NewProjectButton.tsx";
-import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
 import NewTaskModalS from "../components/dashboard/NewTaskModalS.tsx";
 import NewProjectModal from "../components/dashboard/NewProjectModal.tsx";
 import Toast from "../components/Toast.astro";
@@ -71,7 +78,7 @@ if (result && !result.error) {
           <CurrentTasks client:load />
           <WaitingTasks client:load />
           <FinishedTasks client:load />
-          <ActiveUsers users={activeUsers} client:load />
+          <ActiveUsers users={users} client:load />
         </div>
       </div>
 
