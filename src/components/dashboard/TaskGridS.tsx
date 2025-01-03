@@ -1,6 +1,7 @@
 import { useStore } from "@nanostores/solid";
 import { tasksStore } from "../../stores/taskStore.ts";
 import { Calendar, Clock, Users } from "lucide-solid";
+import { Show } from "solid-js";
 
 
 
@@ -11,7 +12,7 @@ function TaskGridS(props: any) {
   const tasks = $tasks()?.tasks || [];
 
   return (
-    <div class="bg-white rounded-xl shadow-sm p-6" id="task-grid">
+    <div class="bg-white rounded-xl shadow-lg p-6" id="task-grid">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-gray-900">Tâches Récentes</h2>
 
@@ -28,12 +29,15 @@ function TaskGridS(props: any) {
         }
       </div>
       <div class="space-y-4" id="task-list">
-        {tasks.length === 0 ? (
-          <div class="text-center text-gray-500 py-6">
-            <p>Aucune tâche disponible. Créez-en une nouvelle pour commencer.</p>
-          </div>
-        ) : (
-          tasks.map((task: any) => (
+        <Show
+          when={(tasks ?? []).length > 0}
+          fallback={
+            <div class="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+              <p class="font-medium">Aucun taches disponible. Ajoutez une tache pour commencer.</p>
+            </div>
+          }
+        >
+          {tasks.map((task: any) => (
             <div
               class="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
               data-task-id={task.id}
@@ -104,7 +108,8 @@ function TaskGridS(props: any) {
               </div>
             </div>
           ))
-        )}
+          }
+        </Show>
       </div>
     </div>
   );

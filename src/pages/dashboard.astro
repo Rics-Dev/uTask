@@ -40,13 +40,14 @@ import FinishedTasks from "../components/dashboard/FinishedTasks.tsx";
 import ActiveUsers from "../components/dashboard/ActiveUsers.tsx";
 import TaskGridS from "../components/dashboard/TaskGridS.tsx";
 import GenericTaskGrid from "../components/dashboard/GenericTaskGrid.astro";
-import ProjectGrid from "../components/dashboard/ProjectGrid.astro";
+import ProjectGrid from "../components/dashboard/ProjectGrid.tsx";
 import GenericProjectGrid from "../components/dashboard/GenericProjectGrid.astro";
 import TaskFilters from "../components/dashboard/TaskFilters.astro";
 import NewTaskButton from "../components/dashboard/NewTaskButton.tsx";
+import NewProjectButton from "../components/dashboard/NewProjectButton.tsx";
 import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
 import NewTaskModalS from "../components/dashboard/NewTaskModalS.tsx";
-import NewProjectModal from "../components/dashboard/NewProjectModal.astro";
+import NewProjectModal from "../components/dashboard/NewProjectModal.tsx";
 import Toast from "../components/Toast.astro";
 
 const result = Astro.getActionResult(actions.logout); // Get action result
@@ -79,13 +80,7 @@ if (result && !result.error) {
       <div class="flex justify-between items-center mb-6">
         <div class="flex space-x-4">
           <NewTaskButton projects={projects.length} client:load />
-          <button
-            id="newProjectBtn"
-            class="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-          >
-            <Plus class="w-4 h-4 mr-2" />
-            Nouveau projet
-          </button>
+          <NewProjectButton client:load />
         </div>
 
         <div class="flex items-center space-x-4">
@@ -133,14 +128,15 @@ if (result && !result.error) {
 
         <!-- Colonne droite: Projets -->
         <div class="col-span-4">
-          <ProjectGrid
-            server:defer
-            showProgress={true}
-            showMembers={true}
-            showDeadlines={true}
-          >
-            <GenericProjectGrid slot="fallback" />
-          </ProjectGrid>
+          <ProjectGrid projects={projects} client:load />
+          <!-- <ProjectGrid -->
+          <!--   server:defer -->
+          <!--   showProgress={true} -->
+          <!--   showMembers={true} -->
+          <!--   showDeadlines={true} -->
+          <!-- > -->
+          <!--   <GenericProjectGrid slot="fallback" /> -->
+          <!-- </ProjectGrid> -->
         </div>
       </div>
       <!-- Ajout des modales -->
@@ -150,7 +146,7 @@ if (result && !result.error) {
         projects={projects}
         client:idle
       />
-      <NewProjectModal />
+      <NewProjectModal user={user} users={users} client:idle />
     </main>
   </div>
 

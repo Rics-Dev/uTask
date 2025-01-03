@@ -10,7 +10,10 @@ export const addProject = defineAction({
     description: z.preprocess(val => val === null ? undefined : val, z.string().optional().default("")),
     startDate: z.string().min(1, "La date de début est requise"),
     endDate: z.string().min(1, "La date de fin est requise"),
-    projectManager: z.coerce.number().positive("Un responsable de projet est requis"),
+    projectManager: z.preprocess((val) => {
+      const coercedVal = Number(val);
+      return Number.isNaN(coercedVal) ? undefined : coercedVal;
+    }, z.number().positive("Un responsable de projet est requis")),
     members: z.array(z.coerce.number()).optional().default([]),
     status: z.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled'], {
       errorMap: () => ({ message: "Le statut doit être en planification, actif, en attente, terminé ou annulé" })
@@ -18,6 +21,15 @@ export const addProject = defineAction({
     priority: z.enum(['low', 'medium', 'high'], {
       errorMap: () => ({ message: "La priorité doit être basse, moyenne ou haute" })
     }).default('medium'),
+    orgId: z.preprocess(
+      (val) => Number(val),
+      z.number().positive()
+    ),
+    createdBy: z.preprocess(
+      (val) => Number(val),
+      z.number().positive()
+    ),
+
   }).refine(
     data => new Date(data.startDate) <= new Date(data.endDate),
     {
@@ -33,17 +45,28 @@ export const addProject = defineAction({
       }
 
       // Get the organization ID from the user's context
-      const orgId = context.locals.user?.orgId;
+      const orgId = input.orgId;
       if (!orgId) {
         throw new ActionError({ code: "UNAUTHORIZED", message: "Aucune organisation trouvée" });
       }
+
+      // Validate that all numeric fields are finite numbers
+      // const numericFields = ['projectManager'];
+      // for (const field of numericFields) {
+      //   if (!Number.isFinite(field)) {
+      //     throw new ActionError({
+      //       code: "BAD_REQUEST",
+      //       message: `La valeur du champ ${field} n'est pas valide`
+      //     });
+      //   }
+      // }
 
       // Create the project
       const [newProject] = await db.insert(Project).values({
         name: input.title,
         description: input.description || '',
         orgId: orgId,
-        createdBy: Number(context.locals.user?.userId),
+        createdBy: input.createdBy,
         createdAt: new Date(),
         startDate: new Date(input.startDate),
         endDate: new Date(input.endDate),
@@ -88,3 +111,4 @@ export const addProject = defineAction({
     }
   }
 });
+
