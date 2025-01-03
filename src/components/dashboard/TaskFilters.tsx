@@ -40,23 +40,25 @@ const TaskFilters = () => {
   });
 
   return (
-    <div class="bg-white rounded-xl shadow-sm p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+    <div class="space-y-6">
+      <h3 class="text-lg font-semibold text-gray-900">Filtres</h3>
 
-      <div class="space-y-4">
+      <div class="space-y-6">
         {/* Priority Filter */}
         <div>
-          <label class="text-sm font-medium text-gray-700">Priorité</label>
-          <div class="space-y-2 mt-2">
+          <label class="text-sm font-medium text-gray-700 mb-3 block">Priorité</label>
+          <div class="space-y-3">
             {priorities.map((priority) => (
-              <label class="flex items-center">
+              <label class="flex items-center group cursor-pointer">
                 <input
                   type="checkbox"
-                  class="rounded text-blue-600"
+                  class="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500"
                   value={priority}
                   onChange={() => handlePriorityChange(priority)}
                 />
-                <span class="ml-2 text-sm text-gray-600 capitalize">{priority}</span>
+                <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-900 capitalize transition-colors">
+                  {priority}
+                </span>
               </label>
             ))}
           </div>
@@ -64,17 +66,19 @@ const TaskFilters = () => {
 
         {/* Status Filter */}
         <div>
-          <label class="text-sm font-medium text-gray-700">Statut</label>
-          <div class="space-y-2 mt-2">
+          <label class="text-sm font-medium text-gray-700 mb-3 block">Statut</label>
+          <div class="space-y-3">
             {statuses.map((status) => (
-              <label class="flex items-center">
+              <label class="flex items-center group cursor-pointer">
                 <input
                   type="checkbox"
-                  class="rounded text-blue-600"
+                  class="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500"
                   value={status}
                   onChange={() => handleStatusChange(status)}
                 />
-                <span class="ml-2 text-sm text-gray-600 capitalize">{status.replace("_", " ")}</span>
+                <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-900 capitalize transition-colors">
+                  {status.replace("_", " ")}
+                </span>
               </label>
             ))}
           </div>
@@ -82,9 +86,9 @@ const TaskFilters = () => {
 
         {/* Date Filter */}
         <div>
-          <label class="text-sm font-medium text-gray-700">Échéance</label>
+          <label class="text-sm font-medium text-gray-700 mb-3 block">Échéance</label>
           <select
-            class="mt-2 w-full rounded-md border-gray-300"
+            class="w-full rounded-xl border-gray-300 py-2.5 text-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
             onChange={handleDateChange}
           >
             <option value="">Sélectionner une date</option>

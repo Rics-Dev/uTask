@@ -21,22 +21,22 @@ export default function NewTaskButton() {
       }}
       onMouseLeave={() => setShowTooltip(false)}
       disabled={projectsNb() === 0}
-      class={`relative flex items-center px-4 py-2 rounded-lg 
-        ${projectsNb() === 0 ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+      class={`relative flex items-center px-5 py-2.5 rounded-xl font-medium transition-all
+        ${projectsNb() === 0
+          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          : 'bg-gradient-to-r from-blue-600 to-indigo-800 text-white hover:shadow-lg hover:shadow-blue-200 active:scale-95'
+        }`}
       onClick={() => {
         if (projectsNb() > 0) isNewTaskOpen.set(true);
       }}
     >
-      <Plus class="w-4 h-4 mr-2" />
-      <span>{projectsNb() > 0 ? 'Nouvelle tache' : 'Nouvelle tache'}</span>
+      <Plus class="w-5 h-5 mr-2" />
+      <span>Nouvelle tache</span>
       {projectsNb() === 0 && showTooltip() && (
-        <span
-          class="absolute left-0 right-0 top-full mt-1 px-4 py-2 text-sm text-white bg-gray-800 rounded-lg  transition-opacity"
-        >
+        <span class="absolute left-0 right-0 top-full mt-2 px-4 py-2 text-sm text-white bg-gray-800 rounded-lg animate-fade-in">
           Veuillez créer un projet pour ajouter une tâche
         </span>
       )}
     </button>
   );
 }
-
