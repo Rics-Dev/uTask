@@ -42,7 +42,7 @@ import TaskGridS from "../components/dashboard/TaskGridS.tsx";
 import GenericTaskGrid from "../components/dashboard/GenericTaskGrid.astro";
 import ProjectGrid from "../components/dashboard/ProjectGrid.tsx";
 import GenericProjectGrid from "../components/dashboard/GenericProjectGrid.astro";
-import TaskFilters from "../components/dashboard/TaskFilters.astro";
+import TaskFilters from "../components/dashboard/TaskFilters.tsx";
 import NewTaskButton from "../components/dashboard/NewTaskButton.tsx";
 import NewProjectButton from "../components/dashboard/NewProjectButton.tsx";
 import NewTaskModal from "../components/dashboard/NewTaskModal.astro";
@@ -107,7 +107,7 @@ if (result && !result.error) {
       <div class="grid grid-cols-12 gap-8">
         <!-- Colonne de gauche: Filtres + Calendrier -->
         <div class="col-span-3 space-y-6">
-          <TaskFilters />
+          <TaskFilters client:load />
           <!-- <MiniCalendar client:load /> -->
           <!-- <NotificationCenter client:load /> -->
         </div>
