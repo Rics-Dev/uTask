@@ -95,11 +95,6 @@ if (result && !result.error) {
 
           <button class="relative">
             <Bell class="w-6 h-6 text-gray-600" />
-            <span
-              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
-            >
-              3
-            </span>
           </button>
         </div>
       </div>
@@ -149,21 +144,4 @@ if (result && !result.error) {
       <NewProjectModal user={user} users={users} client:idle />
     </main>
   </div>
-
-  <script>
-    document.addEventListener("astro:page-load", () => {
-      const newTask = document.querySelector("#newTaskBtn");
-      const newProject = document.querySelector("#newProjectBtn");
-      newTask?.addEventListener("click", () => openModal("newTaskModal"));
-      newProject?.addEventListener("click", () => openModal("newProjectModal"));
-      // Open the modal
-      function openModal(modalId: string) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.classList.remove("modal-hidden");
-          modal.classList.add("modal-visible");
-        }
-      }
-    });
-  </script>
 </Layout>
