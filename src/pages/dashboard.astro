@@ -31,7 +31,7 @@ if (currentOrg) {
 }
 
 import Layout from "../layouts/dashboardLayout.astro";
-import { Filter, Calendar, Bell, Search, Plus } from "lucide-astro";
+import { Filter, Calendar, Bell, Search, Plus, Menu } from "lucide-astro";
 
 import DashHeader from "../components/dashboard/DashHeader.astro";
 import CurrentTasks from "../components/dashboard/CurrentTasks.tsx";
@@ -62,33 +62,34 @@ if (result && !result.error) {
 
     {/* Header */}
     <DashHeader />
+
     {/* Main Content */}
-    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 py-8">
-      <!-- <Counter client:load /> -->
-      {/* Stats Overview */}
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <CurrentTasks client:load />
-
-        <WaitingTasks client:load />
-
-        <FinishedTasks client:load />
-
-        <ActiveUsers users={activeUsers} client:load />
+    <main class="max-w-full mx-auto px-4 py-6">
+      {/* Stats Overview - Now in a scrollable container on mobile */}
+      <div class="overflow-x-auto pb-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 min-w-[640px]">
+          <CurrentTasks client:load />
+          <WaitingTasks client:load />
+          <FinishedTasks client:load />
+          <ActiveUsers users={activeUsers} client:load />
+        </div>
       </div>
 
-      <!-- Nouvelle section: Actions rapides -->
-      <div class="flex justify-between items-center mb-6">
-        <div class="flex space-x-4">
+      {/* Quick Actions - Responsive layout */}
+      <div
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+      >
+        <div class="flex flex-wrap gap-3">
           <NewTaskButton projects={projects.length} client:load />
           <NewProjectButton client:load />
         </div>
 
-        <div class="flex items-center space-x-4">
-          <div class="relative">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <div class="relative flex-1 sm:flex-none">
             <input
               type="search"
               placeholder="Rechercher..."
-              class="pl-10 pr-4 py-2 border rounded-lg"
+              class="w-full sm:w-auto pl-10 pr-4 py-2 border rounded-lg"
             />
             <Search class="w-4 h-4 text-gray-400 absolute left-3 top-3" />
           </div>
@@ -99,49 +100,48 @@ if (result && !result.error) {
         </div>
       </div>
 
-      <div class="grid grid-cols-12 gap-8">
-        <!-- Colonne de gauche: Filtres + Calendrier -->
-        <div class="col-span-3 space-y-6">
-          <TaskFilters client:load />
-          <!-- <MiniCalendar client:load /> -->
-          <!-- <NotificationCenter client:load /> -->
+      {/* Main Grid Layout - Responsive */}
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Filters - Collapsible on mobile */}
+        <div class="lg:col-span-3">
+          <div class="bg-white p-4 rounded-lg shadow mb-6 lg:mb-0">
+            <button
+              class="lg:hidden w-full flex items-center justify-between p-2 mb-4 border rounded"
+              id="filterToggle"
+            >
+              <span class="font-medium">Filters</span>
+              <Menu class="w-5 h-5" />
+            </button>
+            <div class="hidden lg:block" id="filterContent">
+              <TaskFilters client:load />
+            </div>
+          </div>
         </div>
 
-        <!-- Colonne centrale: Tâches -->
-        <div class="col-span-5">
+        {/* Tasks Section */}
+        <div class="lg:col-span-5">
           <TaskGridS client:load tasks={tasks} />
-          <!-- <TaskGrid -->
-          <!--   server:defer -->
-          <!--   showFilters={true} -->
-          <!--   showSort={true} -->
-          <!--   showSearch={true} -->
-          <!--   view="detailed" -->
-          <!-- > -->
-          <!--   <GenericTaskGrid slot="fallback" /> -->
-          <!-- </TaskGrid> -->
         </div>
 
-        <!-- Colonne droite: Projets -->
-        <div class="col-span-4">
+        {/* Projects Section */}
+        <div class="lg:col-span-4">
           <ProjectGrid projects={projects} client:load />
-          <!-- <ProjectGrid -->
-          <!--   server:defer -->
-          <!--   showProgress={true} -->
-          <!--   showMembers={true} -->
-          <!--   showDeadlines={true} -->
-          <!-- > -->
-          <!--   <GenericProjectGrid slot="fallback" /> -->
-          <!-- </ProjectGrid> -->
         </div>
       </div>
-      <!-- Ajout des modales -->
-      <NewTaskModalS
-        user={user}
-        users={users}
-        projects={projects}
-        client:idle
-      />
+
+      {/* Modals */}
+      <NewTaskModalS user={user} users={users} client:idle />
       <NewProjectModal user={user} users={users} client:idle />
     </main>
   </div>
 </Layout>
+
+<script>
+  // Toggle filters on mobile
+  const filterToggle = document.getElementById("filterToggle");
+  const filterContent = document.getElementById("filterContent");
+
+  filterToggle?.addEventListener("click", () => {
+    filterContent?.classList.toggle("hidden");
+  });
+</script>

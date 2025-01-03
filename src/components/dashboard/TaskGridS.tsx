@@ -32,7 +32,7 @@ function TaskGridS(props: any) {
         <Show
           when={(tasks ?? []).length > 0}
           fallback={
-            <div class="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+            <div class="text-center text-gray-500 py-8 px-4 bg-gray-50 rounded-lg">
               <p class="font-medium">Aucun taches disponible. Ajoutez une tache pour commencer.</p>
             </div>
           }

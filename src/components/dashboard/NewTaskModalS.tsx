@@ -2,8 +2,11 @@ import { createEffect, createSignal, Show } from "solid-js";
 import { actions } from 'astro:actions';
 import { useStore } from "@nanostores/solid";
 import { addNanoTask, isNewTaskOpen } from "../../stores/taskStore";
+import { projectsStore } from "../../stores/projectsStore";
 
-export default function NewTaskModalS({ user, users, projects }: { user: any, users: any, projects: any }) {
+export default function NewTaskModalS({ user, users }: { user: any, users: any }) {
+  const $projects = useStore(projectsStore);
+  const projects = $projects()?.projects || [];
   const $isNewTaskOpen = useStore(isNewTaskOpen);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
   const [isLoading, setIsLoading] = createSignal(false);
@@ -156,221 +159,235 @@ export default function NewTaskModalS({ user, users, projects }: { user: any, us
         class="fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full z-50 transition-opacity duration-300 ease-in-out modal-backdrop opacity-0"
         onClick={(e) => e.target === e.currentTarget && closeModal()}
       >
-        <div
-          class="modal-content relative top-10 mx-auto p-6 border w-[32rem] shadow-xl rounded-xl bg-white transform transition-all duration-300 ease-in-out scale-95 opacity-0"
-        >
-          <div class="mt-2">
-            <h3 class="text-xl font-semibold text-gray-900 mb-6">Nouvelle tâche</h3>
-            {errorMessage() && (
-              <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
-                {errorMessage()}
-              </div>
-            )}
-            <form onSubmit={handleSubmit} class="space-y-5">
-              <input type="hidden" name="createdBy" value={formData().createdBy} />
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Titre</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData().title}
-                  onInput={handleInputChange}
-                  required
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                  placeholder="Entrez le titre de la tâche..."
-                />
-              </div>
+        <div class="min-h-screen px-4 text-center">
+          <span class="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  name="description"
-                  value={formData().description}
-                  onInput={handleInputChange}
-                  rows={4}
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm resize-none"
-                  placeholder="Décrivez la tâche en détail..."
-                />
-              </div>
-
-              <div class="grid grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700">Priorité</label>
-                  <select
-                    name="priority"
-                    value={formData().priority}
-                    onInput={handleInputChange}
-                    class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
-                  >
-                    <option value="low">Basse</option>
-                    <option value="medium">Moyenne</option>
-                    <option value="high">Haute</option>
-                  </select>
+          <div
+            class="modal-content relative inline-block w-full max-w-lg p-4 sm:p-6 my-4 sm:my-8 text-left align-middle bg-white rounded-xl shadow-xl transform transition-all duration-300 ease-in-out scale-95 opacity-0"
+          >
+            <div class="mt-2">
+              <h3 class="text-xl font-semibold text-gray-900 mb-6">Nouvelle tâche</h3>
+              {errorMessage() && (
+                <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                  {errorMessage()}
                 </div>
+              )}
+              <form onSubmit={handleSubmit} class="space-y-4">
+                <input type="hidden" name="createdBy" value={formData().createdBy} />
 
+                {/* Basic Info */}
                 <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700">Statut</label>
-                  <select
-                    name="status"
-                    value={formData().status}
-                    onInput={handleInputChange}
-                    class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
-                  >
-                    {/* <option value="not_started">Non commencée</option> */}
-                    <option value="in_progress">En cours</option>
-                    <option value="waiting">En attente</option>
-                    <option value="completed">Terminée</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700">Heures estimées</label>
+                  <label class="block text-sm font-medium text-gray-700">Titre</label>
                   <input
-                    type="number"
-                    name="estimatedHours"
-                    value={formData().estimatedHours}
+                    type="text"
+                    name="title"
+                    value={formData().title}
                     onInput={handleInputChange}
-                    min="0"
-                    step="0.5"
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                    placeholder="0"
+                    required
+                    class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    placeholder="Entrez le titre de la tâche..."
                   />
                 </div>
+
                 <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700">Heures réelles</label>
-                  <input
-                    type="number"
-                    name="actualHours"
-                    value={formData().actualHours}
+                  <label class="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea
+                    name="description"
+                    value={formData().description}
                     onInput={handleInputChange}
-                    min="0"
-                    step="0.5"
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                    placeholder="0"
+                    rows={3}
+                    class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm resize-none"
+                    placeholder="Décrivez la tâche en détail..."
                   />
                 </div>
-              </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Étiquettes</label>
-                <input
-                  type="text"
-                  name="labels"
-                  value={formData().labels}
-                  onInput={handleInputChange}
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                  placeholder="Séparez les étiquettes par des virgules..."
-                />
-              </div>
+                {/* Status and Priority */}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Priorité</label>
+                    <select
+                      name="priority"
+                      value={formData().priority}
+                      onInput={handleInputChange}
+                      class="block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                    >
+                      <option value="low">Basse</option>
+                      <option value="medium">Moyenne</option>
+                      <option value="high">Haute</option>
+                    </select>
+                  </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Progression (%)</label>
-                <input
-                  type="range"
-                  name="progress"
-                  value={formData().progress}
-                  onInput={handleInputChange}
-                  min="0"
-                  max="100"
-                  step="5"
-                  class="mt-1 block w-full"
-                />
-                <div class="text-sm text-gray-500 text-right">{progressDisplay()}</div>
-              </div>
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Statut</label>
+                    <select
+                      name="status"
+                      value={formData().status}
+                      onInput={handleInputChange}
+                      class="block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                    >
+                      <option value="in_progress">En cours</option>
+                      <option value="waiting">En attente</option>
+                      <option value="completed">Terminée</option>
+                    </select>
+                  </div>
+                </div>
 
-              <div class="space-y-4">
-                <div class="flex items-center space-x-2">
+                {/* Hours */}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Heures estimées</label>
+                    <input
+                      type="number"
+                      name="estimatedHours"
+                      value={formData().estimatedHours}
+                      onInput={handleInputChange}
+                      min="0"
+                      step="0.5"
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Heures réelles</label>
+                    <input
+                      type="number"
+                      name="actualHours"
+                      value={formData().actualHours}
+                      onInput={handleInputChange}
+                      min="0"
+                      step="0.5"
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                {/* Labels and Progress */}
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">Étiquettes</label>
                   <input
-                    type="checkbox"
-                    name="isRecurring"
-                    id="isRecurring"
-                    checked={formData().isRecurring}
-                    onChange={handleInputChange}
-                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    type="text"
+                    name="labels"
+                    value={formData().labels}
+                    onInput={handleInputChange}
+                    class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    placeholder="Séparez les étiquettes par des virgules..."
                   />
-                  <label for="isRecurring" class="text-sm font-medium text-gray-700">
-                    Tâche récurrente
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">
+                    Progression ({progressDisplay()})
                   </label>
-                </div>
-
-                <div class={`recurringOptions ${!formData().isRecurring ? 'hidden' : ''} space-y-2`}>
-                  <label class="block text-sm font-medium text-gray-700">Pattern de récurrence</label>
-                  <select
-                    name="recurringPattern"
-                    value={formData().recurringPattern}
+                  <input
+                    type="range"
+                    name="progress"
+                    value={formData().progress}
                     onInput={handleInputChange}
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
-                  >
-                    <option value="daily">Quotidien</option>
-                    <option value="weekly">Hebdomadaire</option>
-                    <option value="monthly">Mensuel</option>
-                    <option value="yearly">Annuel</option>
-                  </select>
+                    min="0"
+                    max="100"
+                    step="5"
+                    class="mt-1 block w-full"
+                  />
                 </div>
-              </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Date d'échéance</label>
-                <input
-                  type="date"
-                  name="dueDate"
-                  value={formData().dueDate}
-                  onInput={handleInputChange}
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                />
-              </div>
+                {/* Recurring Task */}
+                <div class="space-y-4">
+                  <div class="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      name="isRecurring"
+                      id="isRecurring"
+                      checked={formData().isRecurring}
+                      onChange={handleInputChange}
+                      class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label for="isRecurring" class="text-sm font-medium text-gray-700">
+                      Tâche récurrente
+                    </label>
+                  </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Assigné à</label>
-                <select
-                  name="assignedTo"
-                  value={formData().assignedTo}
-                  onInput={handleInputChange}
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
-                >
-                  {users.map((user: any) => (
-                    <option value={user.id}>{user.fullName}</option>
-                  ))}
-                </select>
-              </div>
+                  <div class={`recurringOptions ${!formData().isRecurring ? 'hidden' : ''} space-y-2`}>
+                    <label class="block text-sm font-medium text-gray-700">Pattern de récurrence</label>
+                    <select
+                      name="recurringPattern"
+                      value={formData().recurringPattern}
+                      onInput={handleInputChange}
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                    >
+                      <option value="daily">Quotidien</option>
+                      <option value="weekly">Hebdomadaire</option>
+                      <option value="monthly">Mensuel</option>
+                      <option value="yearly">Annuel</option>
+                    </select>
+                  </div>
+                </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Projet</label>
-                <select
-                  name="projectId"
-                  value={formData().projectId}
-                  onInput={handleInputChange}
-                  required
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
-                >
-                  {projects.map((project: any) => (
-                    <option value={project.id}>{project.name}</option>
-                  ))}
-                </select>
-              </div>
+                {/* Assignment and Project */}
+                <div class="space-y-4">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Date d'échéance</label>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={formData().dueDate}
+                      onInput={handleInputChange}
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    />
+                  </div>
 
-              <div class="flex justify-end space-x-4 pt-4 mt-6 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  class="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors rounded-lg hover:bg-gray-100"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  class="relative min-w-[120px] px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  disabled={isLoading()}
-                >
-                  {isLoading() ? "Loading..." : "Créer la tâche"}
-                </button>
-              </div>
-            </form>
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Assigné à</label>
+                    <select
+                      name="assignedTo"
+                      value={formData().assignedTo}
+                      onInput={handleInputChange}
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                    >
+                      {users.map((user: any) => (
+                        <option value={user.id}>{user.fullName}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Projet</label>
+                    <select
+                      name="projectId"
+                      value={formData().projectId}
+                      onInput={handleInputChange}
+                      required
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                    >
+                      {projects.map((project: any) => (
+                        <option value={project.id}>{project.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-4 space-y-4 space-y-reverse sm:space-y-0 pt-4 mt-6 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors rounded-lg hover:bg-gray-100"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    class="w-full sm:w-auto relative min-w-[120px] px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    disabled={isLoading()}
+                  >
+                    {isLoading() ? "Loading..." : "Créer la tâche"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </Show >
+    </Show>
   );
 }

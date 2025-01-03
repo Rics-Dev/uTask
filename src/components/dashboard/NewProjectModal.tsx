@@ -157,106 +157,113 @@ export default function NewProjectModal({ user, users }: { user: any, users: any
         class="fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full z-50 transition-opacity duration-300 ease-in-out modal-backdrop opacity-0"
         onClick={(e) => e.target === e.currentTarget && closeModal()}
       >
-        <div
-          class="modal-content relative top-10 mx-auto p-6 border w-[32rem] shadow-xl rounded-xl bg-white transform transition-all duration-300 ease-in-out scale-95 opacity-0"
-        >
-          <div class="mt-2">
-            <h3 class="text-xl font-semibold text-gray-900 mb-6">Nouveau projet</h3>
-            {errorMessage() && (
-              <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
-                {errorMessage()}
-              </div>
-            )}
-            <form onSubmit={handleSubmit} class="space-y-5">
-              <input type="hidden" name="createdBy" value={formData().createdBy} />
-              <input type="hidden" name="orgId" value={formData().orgId} />
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700"
-                >Titre du projet</label
-                >
-                <input
-                  type="text"
-                  name="title"
-                  value={formData().title}
-                  onInput={handleInputChange}
-                  required
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
-                  placeholder="Entrez le titre du projet..."
-                />
-              </div>
+        <div class="min-h-screen px-4 text-center">
+          {/* This element centers the modal */}
+          <span class="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700"
-                >Description</label
-                >
-                <textarea
-                  value={formData().description}
-                  onInput={handleInputChange}
-                  name="description"
-                  rows="4"
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm resize-none"
-                  placeholder="Décrivez les objectifs et la portée du projet..."
-                ></textarea>
-              </div>
+          <div
+            class="modal-content relative inline-block w-full max-w-lg p-4 sm:p-6 my-8 text-left align-middle bg-white rounded-xl shadow-xl transform transition-all duration-300 ease-in-out scale-95 opacity-0"
+          >
+            <div class="mt-2">
+              <h3 class="text-xl font-semibold text-gray-900 mb-6">Nouveau projet</h3>
+              {errorMessage() && (
+                <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                  {errorMessage()}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} class="space-y-4">
+                <input type="hidden" name="createdBy" value={formData().createdBy} />
+                <input type="hidden" name="orgId" value={formData().orgId} />
 
-              <div class="grid grid-cols-2 gap-6">
+                {/* Title */}
                 <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700"
-                  >Date de début</label
-                  >
+                  <label class="block text-sm font-medium text-gray-700">
+                    Titre du projet
+                  </label>
                   <input
-                    type="date"
-                    name="startDate"
-                    value={formData().startDate}
+                    type="text"
+                    name="title"
+                    value={formData().title}
                     onInput={handleInputChange}
                     required
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+                    class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+                    placeholder="Entrez le titre du projet..."
                   />
                 </div>
 
+                {/* Description */}
                 <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700"
-                  >Date de fin prévue</label
-                  >
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={formData().endDate}
+                  <label class="block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
+                  <textarea
+                    value={formData().description}
                     onInput={handleInputChange}
-                    required
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
-                  />
+                    name="description"
+                    rows="3"
+                    class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm resize-none"
+                    placeholder="Décrivez les objectifs et la portée du projet..."
+                  ></textarea>
                 </div>
-              </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700"
-                >Responsable du projet</label
-                >
-                <select
-                  name="projectManager"
-                  required
-                  value={formData().projectManager}
-                  onInput={handleInputChange}
-                  class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
-                >
-                  <option value="">Sélectionnez un responsable</option>
-                  {
-                    users.map((user: any) => (
+                {/* Dates */}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Date de début
+                    </label>
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={formData().startDate}
+                      onInput={handleInputChange}
+                      required
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+                    />
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Date de fin prévue
+                    </label>
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={formData().endDate}
+                      onInput={handleInputChange}
+                      required
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Project Manager */}
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">
+                    Responsable du projet
+                  </label>
+                  <select
+                    name="projectManager"
+                    required
+                    value={formData().projectManager}
+                    onInput={handleInputChange}
+                    class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+                  >
+                    <option value="">Sélectionnez un responsable</option>
+                    {users.map((user: any) => (
                       <option value={user.id}>{user.fullName}</option>
-                    ))
-                  }
-                </select>
-              </div>
+                    ))}
+                  </select>
+                </div>
 
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700"
-                >Membres du projet</label
-                >
-                <div class="mt-1 border border-gray-300 rounded-lg">
-                  <div class="p-3 max-h-48 overflow-y-auto">
-                    {
-                      users.map((user: any) => (
+                {/* Members */}
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">
+                    Membres du projet
+                  </label>
+                  <div class="mt-1 border border-gray-300 rounded-lg">
+                    <div class="p-2 max-h-32 sm:max-h-48 overflow-y-auto">
+                      {users.map((user: any) => (
                         <label class="flex items-center p-2 hover:bg-gray-50 rounded-lg">
                           <input
                             type="checkbox"
@@ -269,63 +276,65 @@ export default function NewProjectModal({ user, users }: { user: any, users: any
                             {user.fullName}
                           </span>
                         </label>
-                      ))
-                    }
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="grid grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700"
-                  >Statut initial</label
-                  >
-                  <select
-                    name="status"
-                    value={formData().status}
-                    onInput={handleInputChange}
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
-                  >
-                    <option value="planning">En planification</option>
-                    <option value="active">Actif</option>
-                    <option value="on_hold">En attente</option>
-                  </select>
+                {/* Status and Priority */}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Statut initial
+                    </label>
+                    <select
+                      name="status"
+                      value={formData().status}
+                      onInput={handleInputChange}
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+                    >
+                      <option value="planning">En planification</option>
+                      <option value="active">Actif</option>
+                      <option value="on_hold">En attente</option>
+                    </select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Priorité
+                    </label>
+                    <select
+                      name="priority"
+                      value={formData().priority}
+                      onInput={handleInputChange}
+                      class="mt-1 block w-full px-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+                    >
+                      <option value="low">Basse</option>
+                      <option value="medium">Moyenne</option>
+                      <option value="high">Haute</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div class="space-y-2">
-                  <label class="block text-sm font-medium text-gray-700"
-                  >Priorité</label
+                {/* Buttons */}
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-4 space-y-4 space-y-reverse sm:space-y-0 pt-4 mt-6 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors rounded-lg hover:bg-gray-100"
                   >
-                  <select
-                    name="priority"
-                    value={formData().priority}
-                    onInput={handleInputChange}
-                    class="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm bg-white"
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading()}
+                    class="w-full sm:w-auto relative min-w-[120px] px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                   >
-                    <option value="low">Basse</option>
-                    <option value="medium" selected>Moyenne</option>
-                    <option value="high">Haute</option>
-                  </select>
+                    {isLoading() ? "Loading..." : "Créer le projet"}
+                  </button>
                 </div>
-              </div>
-
-              <div class="flex justify-end space-x-4 pt-4 mt-6 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  class="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors rounded-lg hover:bg-gray-100"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading()}
-                  class="relative min-w-[120px] px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                >
-                  {isLoading() ? "Loading..." : "Créer le projet"}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
