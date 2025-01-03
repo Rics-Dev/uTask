@@ -197,6 +197,7 @@ export const server = {
           });
         }
 
+        await db.update(User).set({ isActive: true }).where(eq(User.id, user.id)).execute();
 
         // Generate authentication token
         const token = await generateAuthToken({
@@ -251,8 +252,14 @@ export const server = {
 
   logout: defineAction({
     accept: 'form',
+    input: z.object({
+      userId: z.string().nonempty(),
+    }),
     handler: async (input, context) => {
       try {
+
+        await db.update(User).set({ isActive: false }).where(eq(User.id, Number(input.userId))).execute();
+
         // Clear cookies
         context.cookies.delete("auth-token");
         context.cookies.delete("session-id");

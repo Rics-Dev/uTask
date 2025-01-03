@@ -29,6 +29,7 @@ const user = Astro.locals.user;
             data-astro-reload
             data-astro-history="replace"
           >
+            <input type="hidden" name="userId" value={user?.userId} />
             <button
               type="submit"
               class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"

@@ -99,7 +99,9 @@ export default function SignupForm() {
       const { data: responseData, error } = await actions.signup(formDataObj);
 
       if (error) {
+        console.error(error);
         setErrorMessage(error.message);
+        setLoading(false);
         return;
       }
 
@@ -108,7 +110,10 @@ export default function SignupForm() {
         window.location.href = '/dashboard';
       }
     } catch (error) {
+      console.error(error);
       setErrorMessage("Une erreur inattendue s'est produite.");
+      setLoading(false);
+
     }
   };
   const handleKeyPress = (e: KeyboardEvent) => {

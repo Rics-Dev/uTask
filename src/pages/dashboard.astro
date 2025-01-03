@@ -15,8 +15,6 @@ const currentOrg = await db
   .where(eq(OrganizationMember.userId, Number(user?.userId)))
   .get();
 
-console.log("currentOrg", currentOrg);
-
 let activeUsers: any[] = [];
 if (currentOrg) {
   activeUsers = await db
@@ -31,8 +29,6 @@ if (currentOrg) {
     )
     .all();
 }
-
-console.log("activeUsers", activeUsers);
 
 import Layout from "../layouts/dashboardLayout.astro";
 import { Filter, Calendar, Bell, Search, Plus } from "lucide-astro";
