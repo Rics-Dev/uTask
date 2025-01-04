@@ -15,7 +15,7 @@ export default function FinishedTasks() {
   });
 
   return (
-    <div class="bg-white rounded-2xl shadow-md shadow-emerald-100/50 p-6 border border-emerald-50 hover:shadow-xl transition-shadow">
+    <div class="bg-white rounded-2xl shadow-md shadow-emerald-100/50 p-6 border border-emerald-50 hover:shadow-lg transition-shadow">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm font-medium text-emerald-600 mb-1">Tâches terminées</p>

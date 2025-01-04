@@ -1,6 +1,7 @@
 import { createSignal, Show, For } from 'solid-js';
 import { ChevronLeft } from 'lucide-solid';
 import { actions } from 'astro:actions';
+import DotSpinner from './spinners/DotSpinner.tsx';
 
 type FormData = {
   fullName: string;
@@ -246,7 +247,11 @@ export default function SignupForm() {
                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 disabled={loading()}
               >
-                {loading() ? 'Chargement...' : 'Créer mon compte'}
+                {loading() ? (
+                  'Chargement...'
+                ) : (
+                  'Créer mon compte'
+                )}
               </button>
             </Show>
           </div>

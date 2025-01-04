@@ -15,7 +15,7 @@ export default function CurrentTasks() {
   });
 
   return (
-    <div class="bg-white rounded-2xl shadow-md shadow-blue-100/50 p-6 border border-blue-50 hover:shadow-xl transition-shadow">
+    <div class="bg-white rounded-2xl shadow-md shadow-blue-100/50 p-6 border border-blue-50 hover:shadow-lg transition-shadow">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm font-medium text-blue-600 mb-1">Tâches en cours</p>

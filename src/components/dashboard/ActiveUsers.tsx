@@ -5,7 +5,7 @@ export default function ActiveUsers(props: any) {
   const activeUsersCount = props.users.filter((user: any) => user.isActive).length;
 
   return (
-    <div class="bg-white rounded-2xl shadow-md shadow-indigo-100/50 p-6 border border-indigo-50 hover:shadow-xl transition-shadow">
+    <div class="bg-white rounded-2xl shadow-md shadow-indigo-100/50 p-6 border border-indigo-50 hover:shadow-lg transition-shadow">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm font-medium text-indigo-600 mb-1">Membres actifs</p>

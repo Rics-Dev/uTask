@@ -15,7 +15,7 @@ export default function WaitingTasks() {
   });
 
   return (
-    <div class="bg-white rounded-2xl shadow-md shadow-orange-100/50 p-6 border border-orange-50 hover:shadow-xl transition-shadow">
+    <div class="bg-white rounded-2xl shadow-md shadow-orange-100/50 p-6 border border-orange-50 hover:shadow-lg transition-shadow">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm font-medium text-orange-600 mb-1">Tâches en attentes</p>
