@@ -1,7 +1,6 @@
 import { createSignal, Show, For } from 'solid-js';
 import { ChevronLeft } from 'lucide-solid';
 import { actions } from 'astro:actions';
-import DotSpinner from './spinners/DotSpinner.tsx';
 
 type FormData = {
   fullName: string;
